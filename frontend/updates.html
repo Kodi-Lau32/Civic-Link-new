@@ -1,34 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-<head></head>
+<head>
+  <title>Ongoing Projects</title>
   <link rel="stylesheet" href="css/index.css">
-  <link rel="stylesheet" href="css/home.css">
-    <link rel="stylesheet" href="css/updates.css">
-  <script defer src="submit.js"></script>
-  <script defer src="search.js"></script>
-  <script>
-  const script = document.getElementById('search-js');
-  script.onload = function() {
-      mapboxsearch.autofill({
-          accessToken: 'pk.eyJ1IjoiY2l2aWMtbGluayIsImEiOiJjbWdwbzd6c2kyY3dyMmpuMnpxMTBrMm13In0.KY2MzBxSk5XV2TcEWe3MQA'
-      });
-  };
-  </script>
+  <link rel="stylesheet" href="css/updates.css">
+  <script defer src="js/config.js"></script>
+  <script defer src="js/nav.js"></script>
+  <script defer src="js/projects.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/render.js"></script>
+  <script defer src="js/project-search.js"></script>
+  <script defer src="js/pages/updates.js"></script>
 </head>
 
-
 <body>
-  <!-- Navbar -->
-  <div class="navbar">
-    <a href="../index.html" class="home-logo">CIVIC LINK</a>
-    <div class="navbar-icons-flex">
-      <a href="../index.html" class="navbar-icons">Home</a>
-      <a href="login.html" class="navbar-icons">Login</a>
-      <a href="updates.html" class="navbar-icons">Updates</a>
-      <a href="submit.html" class="navbar-icons">Submit</a>
-      <button class="search-button" id="openSearch">Search</button>
-    </div>
-  </div>
+  <div class="navbar" id="navbar"></div>
 
   <!-- Header -->
   <div class="headerbox-updates" style="margin-top:70px;">
@@ -36,42 +22,14 @@
     <h4>Recent submissions from your community.</h4>
   </div>
 
-  <!-- Projects -->
-  <div class="projects-container">
-    <div class="project-card">
-      <h2>Evansville City Hall</h2>
-      <p><strong>Location:</strong> 1 NW Martin Luther King Jr Blvd, Evansville, IN</p>
-      <p><strong>Date Range:</strong> Jan 2025 – Apr 2026</p>
-      <p><strong>Date Submitted:</strong> Oct 10, 2025</p>
-      <p><strong>Description:</strong> Renovation project to restore the historic facade, modernize HVAC systems, and improve ADA accessibility. Landscaping and public seating areas will also be added.</p>
-      <p><strong>Submitted by:</strong> John Doe</p>
-    </div>
-
-    <div class="project-card">
-      <h2>Evansville Regional Airport</h2>
-      <p><strong>Location:</strong> 7801 Bussing Dr, Evansville, IN</p>
-      <p><strong>Date Range:</strong> Mar 2025 – Aug 2026</p>
-      <p><strong>Date Submitted:</strong> Sep 28, 2025</p>
-      <p><strong>Description:</strong> Terminal expansion focused on increasing passenger capacity, introducing new security checkpoints, and adding solar panels to reduce energy costs.</p>
-      <p><strong>Submitted by:</strong> Jane Doe</p>
-    </div>
-
-    <div class="project-card">
-      <h2>Evansville Fire Station No. 3</h2>
-      <p><strong>Location:</strong> 321 N Main St, Evansville, IN</p>
-      <p><strong>Date Range:</strong> Jun 2024 – Dec 2025</p>
-      <p><strong>Date Submitted:</strong> Aug 12, 2025</p>
-      <p><strong>Description:</strong> Construction of a modern facility featuring upgraded equipment bays, training areas, and living quarters to improve emergency response times.</p>
-      <p><strong>Submitted by:</strong> Steve Doe</p>
-    </div>
+  <!-- Search -->
+  <div class="updates-search">
+    <input type="search" id="projectSearch" class="updates-search-input"
+           placeholder="Search projects by name, address, or description..." autocomplete="off">
+    <p id="searchStatus" class="updates-search-status"></p>
   </div>
 
-   <!--Search Pop-->
-      <div class="popup-overlay" id="popup">
-  <div class="popup-box">
-    <input type="text" class="search-input" placeholder="Type to search...">
-    <button class="close-btn" id="closePopup">&times;</button>
-  </div>
-</div>
+  <!-- Projects (cards are added by js/pages/updates.js) -->
+  <div class="projects-container" id="projects"></div>
 </body>
 </html>

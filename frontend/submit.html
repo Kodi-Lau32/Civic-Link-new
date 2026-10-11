@@ -1,38 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <title>Engineer Form</title>
   <link rel="stylesheet" href="css/index.css">
   <link rel="stylesheet" href="css/submit.css">
-  <script defer src="submit.js"></script>
   <link href='https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css' rel='stylesheet' />
   <script defer src='https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js'></script>
-  <!--#region initialize mapbox autofill-->
-   <script
-      id="search-js"
-      defer
-      src="https://api.mapbox.com/search-js/v1.2.0/web.js"
-      >
-  </script>
-  <script>
-  const script = document.getElementById('search-js');
-  script.onload = function() {
-      mapboxsearch.autofill({
-          accessToken: 'pk.eyJ1IjoiY2l2aWMtbGluayIsImEiOiJjbWdwbzd6c2kyY3dyMmpuMnpxMTBrMm13In0.KY2MzBxSk5XV2TcEWe3MQA'
-      });
-  };
-  </script>
-  <!--#endregion-->
-
+  <script defer src="https://api.mapbox.com/search-js/v1.2.0/web.js"></script>
+  <script defer src="js/config.js"></script>
+  <script defer src="js/nav.js"></script>
+  <script defer src="js/projects.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/render.js"></script>
+  <script defer src="js/map.js"></script>
+  <script defer src="js/pages/submit.js"></script>
 </head>
 
-<div class="navbar">
-  <a href="../index.html" class="home-logo">CIVIC LINK</a>
-      <div class="navbar-icons-flex">
-      <a href="../index.html" class="navbar-icons">Home</a> 
-      <a href="login.html" class="navbar-icons">Login</a>
-      <a href="updates.html" class="navbar-icons">Updates</a>
-      <a href="submit.html" class="navbar-icons">Submit</a>
-      </div> 
-</div>
+<body>
+<div class="navbar" id="navbar"></div>
 
 <div class="headerbox-form">
     <h1>Submit Projects</h1>
@@ -63,8 +48,8 @@
         <h3>Description</h3>
         <textarea class="inputs" id="descriptionid" placeholder="Ex: This project's purpose is to..." required></textarea> 
         
-        <h3>Address</h3> 
-        <input class="inputs" id="addressid" type="text" autocomplete= "address-line1" placeholder="Ex: 1234 Hollywood Dr." required></input>
+        <h3>Address (optional)</h3> 
+        <input class="inputs" id="addressid" type="text" autocomplete= "address-line1" placeholder="Ex: 1234 Hollywood Dr."></input>
 
       </div>
         
@@ -81,3 +66,5 @@
         <button type="submit" class="button" id="submitid">Submit</button> 
   </form>
 </div>
+</body>
+</html>

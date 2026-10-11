@@ -36,13 +36,14 @@ body {
 .contentbox {
   position: relative;
   display: flex;
+  justify-content: center;
   gap: 29px; /*THIS CONTROLS THE GAP BETWEEN MAP AND UPDATES*/
+  padding: 0 20px 140px;
 }
 
 .samplebox {
   position: relative;
   display: block;
-  left: calc(50% - 365px);
   
   top: 110px;
   padding: 10px;
@@ -53,14 +54,18 @@ body {
   color: #ffffff;
 }
 
+  /* map grows with the window, up to 1000 x 650 */
   #map-container{
-    width: 500px;
-    height: 400px;
+    width: min(1000px, calc(100vw - 360px));
+    min-width: 400px;
+    height: min(650px, calc(100vh - 330px));
+    min-height: 400px;
   }
 
   #updates {
-  width: 200px;          /* fixed width */
-  height: 400px;         /* fixed height */
+  width: 260px;          /* fixed width */
+  height: min(650px, calc(100vh - 330px)); /* same height as the map */
+  min-height: 400px;
   overflow-y: auto;      /* vertical scrollbar appears if content is too tall */
   overflow-x: hidden;    /* prevent horizontal scrolling */
   word-wrap: break-word; /* break long words so they stay inside the box */
@@ -84,69 +89,6 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
 }
      
-  /* Popup Search Styles */
-.search-button {
-  padding: 8px 16px;
-  background-color: #aaaaaa;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 15px;
-  margin-left: 10px;
-  transition: background 0.3s;
-}
-
-.search-button:hover {
-  background-color: #005fa3;
-}
-
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-
-.popup-box {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.search-input {
-  width: 250px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 16px;
-}
-  .search-input:focus{
-    outline: 3px solid #aaaaaa;
-  }
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 22px;
-  cursor: pointer;
-  color: #555;
-}
-
-.close-btn:hover {
-  color: #000;
-}
-
 
 hr {
   margin-top: 15px;

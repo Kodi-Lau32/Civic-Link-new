@@ -13,42 +13,6 @@ h3{
   color: white;
 }
 
-.headerbox-form {
-  position: relative;
-  display: block;
-  z-index: 1;
-
-  left: calc(50% - 225px); 
-  
-  top: 80px;
-  width: 450px;
-  height: 100px;
-  padding: 10px 20px;
-  border-radius: 5px;
-  
-  text-align: center;
-  background: #aaaaaa;
-  color: white;
-
-  backdrop-filter: blur(10px); /* Apply blur effect to content behind */
-  -webkit-backdrop-filter: blur(10px);
-
-  box-shadow: 0 5px 5px rgba(15, 15, 15, 0.3);
-
-}  
-
-  .headerbox-form h1{
-    padding-top: 5px;
-    font-size: 1.7rem;
-  }
-    
-  .headerbox-form h2{
-    padding-top: 10px; 
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-
 /* general info form */
 .general-info {
   position: relative;

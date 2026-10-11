@@ -1,6 +1,18 @@
 # Civic Link
 A website aimed to let city engineers post construction updates about their community.
 
+# Where code lives (frontend/js)
+- config.js — tokens, sheet ID, URLs, map defaults
+- projects.js — converts Google Sheet rows to/from Project objects (only file that knows the sheet format)
+- api.js — all fetches (sheet, Apps Script, geocoding, login)
+- render.js — map popups, update cards, recent list
+- map.js — map + search box + markers
+- project-search.js — keyword search/ranking of projects (title matches rank above address/description)
+- nav.js / search.js — shared navbar (edit NAV_LINKS to add a page) and search popup
+- pages/*.js — one script per page; each HTML file loads only what it needs
+
+Shared styles go in css/index.css; page-only styles in that page's css file.
+
 # To Do List:
 
 Frontend:
@@ -9,26 +21,47 @@ Frontend:
 - make the updates list look pretty 
 - Remove the address box (Don't worry it's useless now )
 
+
 Backend:
 - Lock in map markers onto map when press submit (Should be done?)
 - make home-page display map uneditable (Already done?)
 - Make adding a description possible (DONE)
+- Expand google sheet database to allow expandable info based when clicking tabs
+    - add/link current news about given construction
+    - link communities/headlines 
 
+- Filtering by 
+- More tags in each construction to filter by type
 - make way to edit submission
    - I dont have enough time to make this a feature
+
+
+
+
+
+
+
 - ~~Location doesn't work~~
 - ~~Find way to allow user to submit google coords~~
 - ~~Create login backend (w/ node.js and host it to the internet using a free site like Render)~~
 
-# HOSTING LOGIN BACKEND SERVER ON NODE.JS:
-The login backend is hosted on node.js locally, meaning if you do not host the server on your computer the login will not work.
-If you try logging in without hosting, it will say "server error".
+# RUNNING THE SITE (NODE.JS SERVER)
+Full step-by-step instructions: see RUNNING.md
 
-Hosting login backend:
-1) download node.js 
-2) in vscode terminal, type: "node backendLogin/server.js"
-4) if it says: "✅ Server running on http://localhost:5000", then the server is hosted and logins should work locally.
-5) to turn off server: "ctrl+C" in terminal
+The Node server in backendLogin/ hosts the whole website AND handles login + submissions,
+so open the site through it (not Live Server or by double-clicking the HTML files), or login won't work.
+
+1) download node.js
+2) in vscode terminal: "cd backendLogin", then "npm install" (first time only), then "npm start"
+3) open http://localhost:3000
+4) to turn off server: "ctrl+C" in terminal
+
+How login works:
+- Accounts live in backendLogin/users.json (passwords are hashed, not readable)
+- Add/change an account: "npm run add-user -- <username> <password>" (from backendLogin/); takes effect right away
+- submit.html redirects to the login page unless you're logged in
+- Submissions go to the server, which checks the login and then sends them to the Google Apps Script
+- Logins reset when the server restarts
 
 # Key things to note abt messy backend
 - Google maps have been switched to mapbox 

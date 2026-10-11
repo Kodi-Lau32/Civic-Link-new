@@ -1,43 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <title>Community Projects</title>
   <link rel="stylesheet" href="frontend/css/index.css">
   <link rel="stylesheet" href="frontend/css/home.css">
   <link href='https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css' rel='stylesheet' />
-  <script defer src="frontend/submit.js"></script>
-  <script defer src="frontend/search.js"></script>
   <script defer src='https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js'></script>
-   <script
-      id="search-js"
-      defer
-      src="https://api.mapbox.com/search-js/v1.2.0/web.js"
-      >
-  </script>
-  <script>
-  const script = document.getElementById('search-js');
-  script.onload = function() {
-      mapboxsearch.autofill({
-          accessToken: 'pk.eyJ1IjoiY2l2aWMtbGluayIsImEiOiJjbWdwbzd6c2kyY3dyMmpuMnpxMTBrMm13In0.KY2MzBxSk5XV2TcEWe3MQA'
-      });
-  };
-  </script>
+  <script defer src="https://api.mapbox.com/search-js/v1.2.0/web.js"></script>
+  <script defer src="frontend/js/config.js"></script>
+  <script defer src="frontend/js/nav.js"></script>
+  <script defer src="frontend/js/search.js"></script>
+  <script defer src="frontend/js/projects.js"></script>
+  <script defer src="frontend/js/api.js"></script>
+  <script defer src="frontend/js/render.js"></script>
+  <script defer src="frontend/js/map.js"></script>
+  <script defer src="frontend/js/pages/home.js"></script>
 </head>
 
-
-<div class="navbar">
-  <a href="../index.html" class="home-logo">CIVIC LINK</a>
-    <div class="navbar-icons-flex">
-      <a href="../index.html" class="navbar-icons">Home</a> 
-      <a href="frontend/login.html" class="navbar-icons">Login</a>
-      <a href="frontend/updates.html" class="navbar-icons">Updates</a>
-      <a href="frontend/submit.html" class="navbar-icons">Submit</a>
-      <button class="search-button" id="openSearch">Search</button>
-    </div>
-</div>
-
-
-
 <body>
-
+<div class="navbar" id="navbar" data-search></div>
 
 <!--  "SUBMIT CONSTRUCTION UPDATES HERE"  -->
 <div class="headerbox-home">
@@ -54,18 +35,10 @@
     <div class="samplebox" id="map-container">
       <div id='map' style='width: 99%; height: 99%; margin-top: 0.7%; margin-left: 0.7%; border-radius: 4px;'></div>
     </div>
-            
+
     <!-- UPDATES BOX -->
-    <div class="samplebox"id="updates"><h4>UPDATES</h4><hr></div>
-    
-</div>
-        <div id ="userlist"></div>
-      <!--Search Pop-->
-      <div class="popup-overlay" id="popup">
-  <div class="popup-box">
-    <input type="text" class="search-input" placeholder="Type to search...">
-    <button class="close-btn" id="closePopup">&times;</button>
-  </div>
+    <div class="samplebox" id="updates"><h4>UPDATES</h4><hr></div>
+
 </div>
 </body>
-
+</html>

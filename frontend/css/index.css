@@ -1,3 +1,5 @@
+/* Styles shared by every page. Page-specific styles go in that page's own css file. */
+
 * {
   margin: 0px;
   padding: 0px;
@@ -99,14 +101,65 @@ body {
   background-color:green;
 }
 
+/* Map: status legend + pins that fade out when zoomed out (see js/map.js) */
+.map-legend {
+  position: absolute;
+  right: 10px;
+  bottom: 30px;
+  z-index: 1;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  color: #333;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  text-align: left;
+}
 
-/* Search Popup Styles */
+.map-legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border: 1px solid white;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.mapboxgl-marker > svg {
+  transition: opacity 0.2s;
+}
+
+.mapboxgl-marker.marker-faded {
+  pointer-events: none !important;
+}
+
+
+/* Search button + popup (added by js/search.js) */
+.search-button {
+  padding: 8px 16px;
+  background-color: #aaaaaa;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  margin-left: 10px;
+  transition: background 0.3s;
+}
+
+.search-button:hover {
+  background-color: #005fa3;
+}
 
 .popup-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: none;
   align-items: center;
   justify-content: center;
@@ -117,26 +170,71 @@ body {
   background: white;
   padding: 20px;
   border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   display: flex;
-  gap: 10px;
   align-items: center;
+  gap: 10px;
 }
 
 .search-input {
-  width: 300px;
+  width: 250px;
   padding: 10px;
-  border-radius: 6px;
   border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
 }
+  .search-input:focus{
+    outline: 3px solid #aaaaaa;
+  }
 
 .close-btn {
   background: none;
   border: none;
   font-size: 22px;
   cursor: pointer;
+  color: #555;
 }
 
-        
+.close-btn:hover {
+  color: #000;
+}
+
+
+/* Page title box on the login and submit pages */
+.headerbox-form {
+  position: relative;
+  display: block;
+  z-index: 1;
+
+  left: calc(50% - 225px); 
+  
+  top: 80px;
+  width: 450px;
+  height: 100px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  
+  text-align: center;
+  background: #aaaaaa;
+  color: white;
+
+  backdrop-filter: blur(10px); /* Apply blur effect to content behind */
+  -webkit-backdrop-filter: blur(10px);
+
+  box-shadow: 0 5px 5px rgba(15, 15, 15, 0.3);
+}  
+
+  .headerbox-form h1{
+    padding-top: 5px;
+    font-size: 1.7rem;
+  }
+    
+  .headerbox-form h2{
+    padding-top: 10px; 
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
 
 #updateslist {
   font-size: 0.9rem;
