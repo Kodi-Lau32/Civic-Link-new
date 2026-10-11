@@ -1,6 +1,6 @@
 // Settings shared by every page. Change values here instead of in individual files.
 
-const MAPBOX_TOKEN = "";
+const MAPBOX_TOKEN = "pk.eyJ1IjoiY2l2aWMtbGluayIsImEiOiJjbWdwbzd6c2kyY3dyMmpuMnpxMTBrMm13In0.KY2MzBxSk5XV2TcEWe3MQA";
 
 // Google Sheet that stores projects (read here with the Sheets API; writes go through
 // the server's /api/projects, which checks the login and forwards to Apps Script)
