@@ -47,9 +47,11 @@ Go to **http://localhost:3000** in your browser.
 
 1. Click **Login** in the navbar.
 2. Enter your username and password.
-3. You'll be taken to the **Submit** page. Fill in the form, click the map to place the project, and press **Submit**.
+3. You'll land on your **Dashboard**, which lists every project you've submitted.
+4. Click **+ Submit a new project**, fill in the form, click the map to place the project, and press **Submit**.
+5. To change one of your projects, click **Edit** on its card in the Dashboard, make your changes, and press **Save changes**.
 
-The Submit page sends you back to Login if you aren't logged in. Logins reset whenever the server restarts.
+The Submit and Dashboard pages send you back to Login if you aren't logged in. You can only edit projects you submitted yourself. Logins reset whenever the server restarts.
 
 ## 6. Stop the server
 
@@ -89,5 +91,6 @@ You can set these environment variables when starting the server:
 |---|---|---|
 | `PORT` | `3000` | Port the site runs on |
 | `SUBMIT_URL` | the current Apps Script URL | Google Apps Script that writes submissions to the Google Sheet |
+| `SUBMIT_SECRET` | none | Must match the Apps Script's `SUBMIT_SECRET` script property if you've set one (see `apps-script/Code.gs`) |
 
 Example (Mac/Linux): `PORT=8080 npm start`. On Windows PowerShell: `$env:PORT=8080; npm start`

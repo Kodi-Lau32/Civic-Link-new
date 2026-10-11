@@ -20,8 +20,8 @@
 <div class="navbar" id="navbar"></div>
 
 <div class="headerbox-form">
-    <h1>Submit Projects</h1>
-    <h2>Fill in the fields to submit a project.</h2>
+    <h1 id="formTitle">Submit Projects</h1>
+    <h2 id="formSubtitle">Fill in the fields to submit a project.</h2>
 </div>
 
 <!-- Submit form -->
@@ -40,11 +40,23 @@
         <h3>Est. completion date</h3>
       
         <input class="inputs" type="date" id="range2id" placeholder="Put est end here" required></input>
+
+        <h3>Status</h3>
+        <select class="inputs" id="statusid">
+          <option value="" selected>Automatic (from dates)</option>
+          <!-- options are added from PROJECT_STATUSES by js/pages/submit.js -->
+        </select>
         <br>
         <!--<input class="inputs" type="date" id="dateid" placeholder="Put date here" required></input> -->
       </div>
     
       <div class="right-info">
+        <h3>Project type</h3>
+        <select class="inputs" id="typeid" required>
+          <option value="" disabled selected>Choose a type...</option>
+          <!-- options are added from PROJECT_TYPES by js/pages/submit.js -->
+        </select>
+
         <h3>Description</h3>
         <textarea class="inputs" id="descriptionid" placeholder="Ex: This project's purpose is to..." required></textarea> 
         

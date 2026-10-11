@@ -4,20 +4,38 @@ async function loadProjects() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${SHEETS_API_KEY}`;
   const response = await fetch(url);
   const data = await response.json();
-  return rowsToObjects(data.values).map(parseProject);
+  return assignKeys(rowsToObjects(data.values).map(parseProject));
 }
 
 // thrown when the server says the session is missing/expired
 class NotLoggedInError extends Error {}
 
+// new project; the server records the logged-in engineer as its author. Resolves to the new id.
 async function submitProject(project) {
-  const response = await fetch(`${API_URL}/projects`, {
-    method: "POST",
+  return sendProject("POST", `${API_URL}/projects`, project);
+}
+
+// saves changes to one of the logged-in engineer's own projects
+async function updateProject(id, project) {
+  return sendProject("PUT", `${API_URL}/projects/${encodeURIComponent(id)}`, project);
+}
+
+async function sendProject(method, url, project) {
+  const response = await fetch(url, {
+    method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(toSheetPacket(project)),
   });
   if (response.status === 401) throw new NotLoggedInError();
-  if (!response.ok) throw new Error(`Submit failed (${response.status})`);
+
+  const result = await response.json().catch(() => null);
+  if (!result) {
+    // not our server (e.g. opened with Live Server, which answers 405/404 to API calls)
+    throw new Error(`The Civic Link server didn't answer (${response.status}). Start it with "npm start" ` +
+      `in backendLogin and open the site at http://localhost:3000.`);
+  }
+  if (!response.ok) throw new Error(result.message || `Save failed (${response.status})`);
+  return result.id;
 }
 
 // coordinates -> address text

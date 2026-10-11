@@ -1,4 +1,4 @@
-// Builds the HTML for displaying projects (map popups, update cards, recent list).
+// Builds the HTML for displaying projects (map sidebar, update cards, recent list).
 // Uses textContent instead of innerHTML so sheet data can't inject HTML/scripts.
 
 function formatDate(date) {
@@ -34,17 +34,98 @@ function labeledLine(tag, label, value) {
   return line;
 }
 
-// content of the popup shown when a map marker is clicked
-function buildProjectPopup(project) {
+// "Submitted by" line, or nothing for older projects without an author (spread into append())
+function authorLine(project) {
+  return project.author ? [labeledLine("p", "Submitted by", project.author)] : [];
+}
+
+// content of the map sidebar shown when a project is clicked; color is the project's pin color
+function buildProjectDetails(project, color) {
   const box = document.createElement("div");
-  box.style.color = "black";
+
+  const title = document.createElement("h3");
+  title.textContent = project.name;
+
+  const type = document.createElement("div");
+  type.className = "map-sidebar-type";
+  const swatch = document.createElement("span");
+  swatch.className = "map-legend-dot";
+  swatch.style.background = color;
+  type.append(swatch, PROJECT_TYPES[project.type]);
+
   box.append(
-    labeledLine("div", "Name", project.name),
-    labeledLine("div", "Range", formatDateRange(project)),
-    labeledLine("div", "Description", project.description),
-    labeledLine("div", "Address", project.address)
+    title,
+    type,
+    labeledLine("p", "Status", PROJECT_STATUSES[project.status]),
+    labeledLine("p", "Dates", formatDateRange(project)),
+    labeledLine("p", "Address", project.address),
+    labeledLine("p", "Description", project.description),
+    labeledLine("p", "Submitted", formatDate(project.submittedAt)),
+    ...authorLine(project)
   );
   return box;
+}
+
+// map picture for a project, from Mapbox's static image API (width/height in CSS pixels)
+function staticMapUrl(project, width, height) {
+  const color = TYPE_COLORS[project.type].replace("#", "");
+  const point = `${project.lng},${project.lat}`;
+  return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+${color}(${point})/${point},14,0/` +
+    `${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`;
+}
+
+// link to a project's own page (frontend/project.html)
+function projectPageUrl(project) {
+  return `project.html?p=${encodeURIComponent(project.key)}`;
+}
+
+// newsletter-style story that links to the project's page; lead = the big one
+function renderFeaturedStory(project, lead) {
+  const story = document.createElement("a");
+  story.className = lead ? "featured-story featured-story-lead" : "featured-story";
+  story.href = projectPageUrl(project);
+
+  if (hasLocation(project)) {
+    const image = document.createElement("img");
+    image.className = "featured-map";
+    image.src = lead ? staticMapUrl(project, 800, 520) : staticMapUrl(project, 500, 200);
+    image.alt = `Map of ${project.address || project.name}`;
+    image.loading = "lazy";
+    story.appendChild(image);
+  }
+
+  const body = document.createElement("div");
+  body.className = "featured-body";
+
+  const meta = document.createElement("div");
+  meta.className = "featured-meta";
+  const badge = document.createElement("span");
+  badge.className = "type-badge";
+  badge.style.background = TYPE_COLORS[project.type];
+  badge.textContent = PROJECT_TYPES[project.type];
+  meta.append(badge, [PROJECT_STATUSES[project.status], formatDate(project.submittedAt)].filter(Boolean).join(" · "));
+
+  const title = document.createElement("h3");
+  title.textContent = project.name;
+
+  const description = document.createElement("p");
+  description.className = "featured-description";
+  description.textContent = project.description;
+
+  const details = document.createElement("p");
+  details.className = "featured-details";
+  details.textContent = [project.address, formatDateRange(project)].filter(Boolean).join(" · ");
+
+  body.append(meta, title, description, details);
+  if (project.author) {
+    const author = document.createElement("p");
+    author.className = "featured-author";
+    author.textContent = `Submitted by ${project.author}`;
+    body.appendChild(author);
+  }
+
+  story.appendChild(body);
+  return story;
 }
 
 // card on the Updates page
@@ -57,10 +138,13 @@ function renderProjectCard(project) {
 
   card.append(
     title,
+    labeledLine("p", "Type", PROJECT_TYPES[project.type]),
+    labeledLine("p", "Status", PROJECT_STATUSES[project.status]),
     labeledLine("p", "Location", project.address),
     labeledLine("p", "Date Range", formatDateRange(project)),
     labeledLine("p", "Date Submitted", formatDate(project.submittedAt)),
-    labeledLine("p", "Description", project.description)
+    labeledLine("p", "Description", project.description),
+    ...authorLine(project)
   );
   return card;
 }

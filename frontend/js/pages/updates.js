@@ -1,5 +1,8 @@
-// Updates page: a card for every submitted project, newest first, with a search bar to filter them.
+// Updates page: the newest projects as newsletter-style stories at the top, then the full
+// gallery of every project (newest first) with a search bar.
 // The search is kept in the URL (updates.html?q=bridge) so results can be linked to.
+
+const FEATURED_COUNT = 3; // 1 lead story + 2 smaller ones
 
 let allProjects = [];
 
@@ -17,12 +20,22 @@ async function initUpdatesPage() {
     return;
   }
 
+  showFeatured();
+
   searchInput.value = new URLSearchParams(window.location.search).get("q") || "";
   searchInput.addEventListener("input", () => {
     updateSearchUrl(searchInput.value);
     showProjects(searchInput.value);
   });
   showProjects(searchInput.value);
+  if (searchInput.value) document.getElementById("allProjects").scrollIntoView(); // linked search: jump to results
+}
+
+function showFeatured() {
+  const featured = document.getElementById("featured");
+  const newest = allProjects.slice(0, FEATURED_COUNT);
+  featured.replaceChildren(...newest.map((project, i) => renderFeaturedStory(project, i === 0)));
+  if (newest.length === 0) featured.append("No projects yet.");
 }
 
 function showProjects(query) {

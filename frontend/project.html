@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Project</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/updates.css">
+  <link rel="stylesheet" href="css/project.css">
+  <link href='https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css' rel='stylesheet' />
+  <script defer src='https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js'></script>
+  <script defer src="js/config.js"></script>
+  <script defer src="js/nav.js"></script>
+  <script defer src="js/projects.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/render.js"></script>
+  <script defer src="js/pages/project.js"></script>
+</head>
+
+<body>
+  <div class="navbar" id="navbar"></div>
+
+  <main class="project-page">
+    <a href="updates.html" class="project-back">← Back to updates</a>
+
+    <!-- filled in by js/pages/project.js -->
+    <article class="project-article" id="project">
+      <p class="project-loading">Loading project...</p>
+    </article>
+
+    <section class="project-more" id="moreSection" hidden>
+      <h2 class="section-title" id="moreTitle">Nearby projects</h2>
+      <div class="project-more-grid" id="more"></div>
+    </section>
+  </main>
+</body>
+</html>

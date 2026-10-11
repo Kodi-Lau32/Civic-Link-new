@@ -18,18 +18,25 @@
 
   <!-- Header -->
   <div class="headerbox-updates" style="margin-top:70px;">
-    <h2>Ongoing Projects</h2>
-    <h4>Recent submissions from your community.</h4>
+    <h2>Project Updates</h2>
+    <h4>The latest from your community.</h4>
   </div>
 
-  <!-- Search -->
-  <div class="updates-search">
-    <input type="search" id="projectSearch" class="updates-search-input"
-           placeholder="Search projects by name, address, or description..." autocomplete="off">
-    <p id="searchStatus" class="updates-search-status"></p>
-  </div>
+  <!-- Newest projects, newsletter style (added by js/pages/updates.js) -->
+  <section class="updates-section">
+    <h2 class="section-title">Latest updates</h2>
+    <div class="featured-grid" id="featured"></div>
+  </section>
 
-  <!-- Projects (cards are added by js/pages/updates.js) -->
-  <div class="projects-container" id="projects"></div>
+  <!-- Full gallery with search -->
+  <section class="updates-section" id="allProjects">
+    <h2 class="section-title">All projects</h2>
+    <div class="updates-search">
+      <input type="search" id="projectSearch" class="updates-search-input"
+             placeholder="Search projects by name, address, or description..." autocomplete="off">
+      <p id="searchStatus" class="updates-search-status"></p>
+    </div>
+    <div class="projects-container" id="projects"></div>
+  </section>
 </body>
 </html>

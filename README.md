@@ -10,6 +10,15 @@ A website aimed to let city engineers post construction updates about their comm
 - project-search.js — keyword search/ranking of projects (title matches rank above address/description)
 - nav.js / search.js — shared navbar (edit NAV_LINKS to add a page) and search popup
 - pages/*.js — one script per page; each HTML file loads only what it needs
+  - pages/dashboard.js — engineer dashboard (your own projects + Edit links)
+  - pages/submit.js — submit form; also the edit form when opened as submit.html?edit=<id>
+  - pages/project.js — a single project's page (project.html?p=<key>), opened from the Updates page stories
+
+Google Sheet script: apps-script/Code.gs (copy of what's pasted into the sheet's Apps Script editor)
+
+Adding a project type: add it to PROJECT_TYPES and TYPE_COLORS (projects.js), and TYPES (apps-script/Code.gs, then redeploy).
+Adding a status: add it to PROJECT_STATUSES (projects.js) and STATUSES (apps-script/Code.gs, then redeploy).
+Map filters come from FILTER_GROUPS (map.js); the sidebar content is buildProjectDetails (render.js).
 
 Shared styles go in css/index.css; page-only styles in that page's css file.
 
@@ -35,12 +44,6 @@ Backend:
 - make way to edit submission
    - I dont have enough time to make this a feature
 
-
-
-
-
-
-
 - ~~Location doesn't work~~
 - ~~Find way to allow user to submit google coords~~
 - ~~Create login backend (w/ node.js and host it to the internet using a free site like Render)~~
@@ -59,8 +62,11 @@ so open the site through it (not Live Server or by double-clicking the HTML file
 How login works:
 - Accounts live in backendLogin/users.json (passwords are hashed, not readable)
 - Add/change an account: "npm run add-user -- <username> <password>" (from backendLogin/); takes effect right away
-- submit.html redirects to the login page unless you're logged in
-- Submissions go to the server, which checks the login and then sends them to the Google Apps Script
+- submit.html and dashboard.html redirect to the login page unless you're logged in; logging in opens the dashboard
+- Submissions and edits go to the server, which checks the login and then sends them to the Google Apps Script
+- Each new project's "author" column is set by the server to the logged-in username; only that engineer can edit it
+  (older rows have no author and a rounded-off id like 8.27513E+15, so they can't be edited from the site;
+   to make one editable, put a username in its author cell and any unique text, e.g. "legacy-1", in its id cell)
 - Logins reset when the server restarts
 
 # Key things to note abt messy backend

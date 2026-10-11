@@ -29,12 +29,140 @@ body {
     margin-top: 15px;
     font-weight: 600;
   }
+/* Page sections: "Latest updates" and "All projects" */
+.updates-section {
+  max-width: 1100px;
+  margin: 100px auto 0;
+  padding: 0 20px;
+}
+  .updates-section + .updates-section {
+    margin-top: 60px;
+  }
+  #allProjects {
+    scroll-margin-top: 60px; /* keep the heading below the fixed navbar when jumped to */
+  }
+
+.section-title {
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+}
+
+/* Newsletter-style stories: one big lead story, two smaller ones beside it */
+.featured-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+/* each story is a link to the project's page */
+.featured-story {
+  display: block;
+  overflow: hidden;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 5px 10px rgba(15, 15, 15, 0.3);
+  color: #333;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+  .featured-story:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 18px rgba(15, 15, 15, 0.35);
+  }
+  .featured-story-lead {
+    display: flex;
+    flex-direction: column;
+    grid-row: span 2;
+  }
+
+.featured-map {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  background: #ddd;
+}
+  /* the lead's map grows to fill the height of the two stories beside it */
+  .featured-story-lead .featured-map {
+    flex: 1;
+    min-height: 300px;
+  }
+
+.featured-body {
+  padding: 16px 20px 20px;
+}
+
+.featured-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.type-badge {
+  padding: 2px 10px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.featured-story h3 {
+  margin: 10px 0 6px;
+  color: #222;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+  .featured-story-lead h3 {
+    font-size: 1.9rem;
+  }
+
+/* cut long descriptions off after a few lines */
+.featured-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+  .featured-story-lead .featured-description {
+    -webkit-line-clamp: 6;
+    font-size: 1.05rem;
+  }
+
+.featured-details,
+.featured-author {
+  margin-top: 10px;
+  color: #777;
+  font-size: 0.8rem;
+}
+  .featured-author {
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+@media (max-width: 800px) {
+  .featured-grid {
+    grid-template-columns: 1fr;
+  }
+  .featured-story-lead {
+    grid-row: auto;
+  }
+}
+
 /* Search bar */
 .updates-search {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 100px;
 }
 
 .updates-search-input {
