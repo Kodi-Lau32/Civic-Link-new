@@ -35,14 +35,17 @@ Backend:
 - Lock in map markers onto map when press submit (Should be done?)
 - make home-page display map uneditable (Already done?)
 - Make adding a description possible (DONE)
-- Expand google sheet database to allow expandable info based when clicking tabs
-    - add/link current news about given construction
-    - link communities/headlines 
+- Expand google sheet database to allow expandable info based when clicking tabs (done)
+    - add/link current news about given construction (need to add editable specific tabs)
+    - link communities/headlines (done)
 
 - Filtering by 
-- More tags in each construction to filter by type
-- make way to edit submission
+- More tags in each construction to filter by type (Done)
+- ownership tag (still need to connect to google sheet API)
+- make way to edit submission (almost)
    - I dont have enough time to make this a feature
+- 
+
 
 - ~~Location doesn't work~~
 - ~~Find way to allow user to submit google coords~~
