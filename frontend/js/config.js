@@ -2,12 +2,14 @@
 
 const MAPBOX_TOKEN = "pk.eyJ1IjoiY2l2aWMtbGluayIsImEiOiJjbWdwbzd6c2kyY3dyMmpuMnpxMTBrMm13In0.KY2MzBxSk5XV2TcEWe3MQA";
 
-// Google Sheet that stores projects (read here with the Sheets API; writes go through
-// the server's /api/projects, which checks the login and forwards to Apps Script)
-const SHEETS_API_KEY = "AIzaSyAoYSJ-B-i4r-jgl0n3is3VJMgBhVhwy44";
-const SHEET_ID = "1UK356MwkhS73fkZHGkeQwS_UBx9YpTf9dIunNaGbXLw";
-const SHEET_NAME = "Sheet1";
-
+// Supabase database that stores projects (supabase/schema.sql).
+// The website only reads with this key; adding/editing goes through the server's /api/projects,
+// which checks the login and writes with the secret key (see backendLogin/server.js).
+// Find both values in the Supabase dashboard > Project Settings > API Keys / Data API.
+// ===== PASTE YOUR SUPABASE VALUES HERE =====
+const SUPABASE_URL = "https://YOUR-PROJECT-ID.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "PASTE-YOUR-PUBLISHABLE-OR-ANON-KEY-HERE"; // safe to share: it can only read
+// ===========================================
 
 // Login/submit API (backendLogin/server.js), served from the same address as the site
 const API_URL = "/api";

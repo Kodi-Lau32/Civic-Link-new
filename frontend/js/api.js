@@ -1,10 +1,18 @@
-// All network requests: Google Sheet, our server (login + submit), Mapbox geocoding.
+// All network requests: Supabase database, our server (login + submit), Mapbox geocoding.
 
+// every project in the database (Supabase's REST API; the publishable key can only read)
 async function loadProjects() {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${SHEETS_API_KEY}`;
-  const response = await fetch(url);
-  const data = await response.json();
-  return assignKeys(rowsToObjects(data.values).map(parseProject));
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*`, {
+    headers: supabaseHeaders(SUPABASE_PUBLISHABLE_KEY),
+  });
+  const rows = await response.json();
+  if (!response.ok) throw new Error(`Couldn't load projects: ${rows.message || response.status}`);
+  return rows.map(parseProject);
+}
+
+// older Supabase keys are JWTs ("eyJ...") and also go in Authorization; newer sb_ keys only go in apikey
+function supabaseHeaders(key) {
+  return key.startsWith("eyJ") ? { apikey: key, Authorization: `Bearer ${key}` } : { apikey: key };
 }
 
 // thrown when the server says the session is missing/expired
@@ -24,7 +32,7 @@ async function sendProject(method, url, project) {
   const response = await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(toSheetPacket(project)),
+    body: JSON.stringify(toDatabaseRow(project)),
   });
   if (response.status === 401) throw new NotLoggedInError();
 

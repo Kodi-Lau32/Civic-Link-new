@@ -1,18 +1,18 @@
-// Everything that knows how a project is stored in the Google Sheet lives here.
+// Everything that knows how a project is stored in the database lives here.
 // The rest of the app only uses the Project objects made by parseProject():
-//   { id, key, row, name, description, address, type, status, statusSetting, author, lng, lat, startDate, endDate, submittedAt }
-//   key: unique per project, used in page links (the id, or "row-N" for older rows whose ids aren't unique)
+//   { id, key, name, description, address, type, status, statusSetting, author, lng, lat, startDate, endDate, submittedAt }
+//   key: used in page links (same as the id)
 //
-// Sheet columns: name | range | date | location | description | id | address | type | status | author
-//   range    "YYYY-MM-DD,YYYY-MM-DD" (start, end)
-//   date     submission time as a Date() string
-//   location "lng,lat"
-//   type     a key from PROJECT_TYPES (blank on older rows)
-//   status   a key from PROJECT_STATUSES, or blank = work it out from the dates
-//   author   username of the engineer who submitted it (set by the server; blank on older rows)
+// Database columns (table "projects", see supabase/schema.sql):
+//   id | name | description | address | type | status | author | lng | lat | start_date | end_date | submitted_at
+//   type         a key from PROJECT_TYPES
+//   status       a key from PROJECT_STATUSES, or null = work it out from the dates
+//   author       username of the engineer who submitted it (set by the server; null on old sheet rows)
+//   start_date / end_date  "YYYY-MM-DD"
+//   submitted_at timestamp, set by the database
 
-// project types: key stored in the sheet -> label shown on the site.
-// To add a type, add it here and in TYPE_COLORS, and add the key to TYPES in the Apps Script.
+// project types: key stored in the database -> label shown on the site.
+// To add a type, add it here and in TYPE_COLORS, and to the type check in supabase/schema.sql.
 const PROJECT_TYPES = {
   construction: "Construction",
   flock_camera: "Flock camera",
@@ -27,10 +27,10 @@ const TYPE_COLORS = {
   data_center: "#7b4fd6",
   unwanted_repair: "#2f7fd8",
 };
-const DEFAULT_PROJECT_TYPE = "construction"; // used for rows from before types existed
+const DEFAULT_PROJECT_TYPE = "construction";
 
-// project statuses: key stored in the sheet -> label shown on the site.
-// To add one, add it here and to STATUSES in the Apps Script.
+// project statuses: key stored in the database -> label shown on the site.
+// To add one, add it here and to the status check in supabase/schema.sql.
 const PROJECT_STATUSES = {
   proposed: "Proposed construction",
   ongoing: "Ongoing construction",
@@ -38,40 +38,25 @@ const PROJECT_STATUSES = {
   rejected: "Rejected project",
 };
 
-// turns the Sheets API's array of rows into objects keyed by the header row
-function rowsToObjects(values) {
-  if (!values || values.length === 0) return [];
-  const headers = values[0];
-
-  return values.slice(1).map((row, index) => {
-    const obj = { _row: index + 2 }; // sheet row number (row 1 is the header)
-    headers.forEach((header, i) => {
-      obj[header] = row[i] ?? "";
-    });
-    return obj;
-  });
-}
-
+// database row -> Project
 function parseProject(row) {
-  const [lng, lat] = splitPair(row.location).map(parseCoord);
-  const [start, end] = splitPair(row.range);
-  const submittedAt = row.date ? new Date(row.date) : null;
-  const startDate = parseDay(start);
-  const endDate = parseDay(end);
-  const statusSetting = parseKey(row.status, PROJECT_STATUSES) || "";
+  const startDate = parseDay(row.start_date);
+  const endDate = parseDay(row.end_date);
+  const submittedAt = row.submitted_at ? new Date(row.submitted_at) : null;
+  const statusSetting = PROJECT_STATUSES[row.status] ? row.status : "";
 
   return {
     id: row.id,
-    row: row._row,
+    key: String(row.id),
     name: row.name || "",
     description: row.description || "",
     address: row.address || "",
-    type: parseKey(row.type, PROJECT_TYPES) || DEFAULT_PROJECT_TYPE,
+    type: PROJECT_TYPES[row.type] ? row.type : DEFAULT_PROJECT_TYPE,
     status: projectStatus(statusSetting, startDate, endDate),
     statusSetting, // what's stored: a status key, or "" for automatic
     author: row.author || "",
-    lng,
-    lat,
+    lng: row.lng ?? NaN,
+    lat: row.lat ?? NaN,
     startDate,
     endDate,
     submittedAt: submittedAt && !isNaN(submittedAt) ? submittedAt : null,
@@ -86,28 +71,19 @@ function projectStatus(statusSetting, startDate, endDate, today = new Date()) {
   return "ongoing";
 }
 
-// the packet the Apps Script expects (keep key order and formats the same)
-function toSheetPacket(project) {
+// Project -> the columns the browser may send (the server sets id, author, and submitted_at)
+function toDatabaseRow(project) {
   return {
     name: project.name,
-    range: [formatDay(project.startDate), formatDay(project.endDate)],
-    date: project.submittedAt ? project.submittedAt.toString() : "",
-    location: [project.lng, project.lat],
     description: project.description,
-    id: project.id,
     address: project.address,
     type: project.type,
-    status: project.statusSetting,
+    status: project.statusSetting || null,
+    lng: project.lng,
+    lat: project.lat,
+    start_date: formatDay(project.startDate) || null,
+    end_date: formatDay(project.endDate) || null,
   };
-}
-
-// gives each project a key for links: its id if no other project shares it, otherwise "row-N".
-// (older rows have ids the sheet rounded off, like 8.27513E+15, which can repeat)
-function assignKeys(projects) {
-  const idCounts = {};
-  projects.forEach((p) => { idCounts[p.id] = (idCounts[p.id] || 0) + 1; });
-  projects.forEach((p) => { p.key = p.id && idCounts[p.id] === 1 ? String(p.id) : `row-${p.row}`; });
-  return projects;
 }
 
 function hasLocation(project) {
@@ -117,24 +93,6 @@ function hasLocation(project) {
 // sort comparator: most recently submitted first
 function newestFirst(a, b) {
   return (b.submittedAt || 0) - (a.submittedAt || 0);
-}
-
-function splitPair(text) {
-  const parts = (text || "").split(",");
-  return [parts[0], parts[1]];
-}
-
-// finds the key in options matching text, which can be the key ("flock_camera") or the label
-// ("Flock camera") in any capitalization, so rows typed into the sheet by hand still work. null if none.
-function parseKey(text, options) {
-  const normalize = (s) => String(s || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
-  const wanted = normalize(text);
-  if (!wanted) return null;
-  return Object.keys(options).find((key) => key === wanted || normalize(options[key]) === wanted) || null;
-}
-
-function parseCoord(text) {
-  return text && text.trim() !== "" ? Number(text) : NaN;
 }
 
 // "YYYY-MM-DD" -> local Date (new Date("YYYY-MM-DD") would be UTC and can show the previous day)

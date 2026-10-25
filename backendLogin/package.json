@@ -4,8 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "add-user": "node users.js"
+    "start": "node --env-file-if-exists=.env server.js",
+    "add-user": "node users.js",
+    "import-sheet": "node --env-file-if-exists=.env import-sheet.js"
   },
   "keywords": [],
   "author": "",

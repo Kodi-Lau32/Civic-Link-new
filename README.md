@@ -2,9 +2,9 @@
 A website aimed to let city engineers post construction updates about their community.
 
 # Where code lives (frontend/js)
-- config.js — tokens, sheet ID, URLs, map defaults
-- projects.js — converts Google Sheet rows to/from Project objects (only file that knows the sheet format)
-- api.js — all fetches (sheet, Apps Script, geocoding, login)
+- config.js — tokens, Supabase URL + publishable key, URLs, map defaults
+- projects.js — converts database rows to/from Project objects (only file that knows the table's columns)
+- api.js — all fetches (Supabase, our server, geocoding, login)
 - render.js — map popups, update cards, recent list
 - map.js — map + search box + markers
 - project-search.js — keyword search/ranking of projects (title matches rank above address/description)
@@ -14,10 +14,14 @@ A website aimed to let city engineers post construction updates about their comm
   - pages/submit.js — submit form; also the edit form when opened as submit.html?edit=<id>
   - pages/project.js — a single project's page (project.html?p=<key>), opened from the Updates page stories
 
-Google Sheet script: apps-script/Code.gs (copy of what's pasted into the sheet's Apps Script editor)
+Database: Supabase table "projects", created by supabase/schema.sql (paste it into Supabase > SQL Editor > Run).
+The site reads it with the publishable key (frontend/js/config.js); the server writes it with the secret key (backendLogin/.env).
 
-Adding a project type: add it to PROJECT_TYPES and TYPE_COLORS (projects.js), and TYPES (apps-script/Code.gs, then redeploy).
-Adding a status: add it to PROJECT_STATUSES (projects.js) and STATUSES (apps-script/Code.gs, then redeploy).
+Adding a project type: add it to PROJECT_TYPES and TYPE_COLORS (projects.js), and to the type check in supabase/schema.sql.
+Adding a status: add it to PROJECT_STATUSES (projects.js) and to the status check in supabase/schema.sql.
+(To change a check on an existing database, run in the SQL Editor, e.g.:
+  alter table projects drop constraint projects_type_check;
+  alter table projects add constraint projects_type_check check (type in ('construction', ..., 'new_type'));)
 Map filters come from FILTER_GROUPS (map.js); the sidebar content is buildProjectDetails (render.js).
 
 Shared styles go in css/index.css; page-only styles in that page's css file.
@@ -66,10 +70,10 @@ How login works:
 - Accounts live in backendLogin/users.json (passwords are hashed, not readable)
 - Add/change an account: "npm run add-user -- <username> <password>" (from backendLogin/); takes effect right away
 - submit.html and dashboard.html redirect to the login page unless you're logged in; logging in opens the dashboard
-- Submissions and edits go to the server, which checks the login and then sends them to the Google Apps Script
+- Submissions and edits go to the server, which checks the login and then saves them to Supabase
 - Each new project's "author" column is set by the server to the logged-in username; only that engineer can edit it
-  (older rows have no author and a rounded-off id like 8.27513E+15, so they can't be edited from the site;
-   to make one editable, put a username in its author cell and any unique text, e.g. "legacy-1", in its id cell)
+  (projects copied from the old Google Sheet have no author, so they can't be edited from the site;
+   to make one editable, type a username into its author cell in Supabase > Table Editor > projects)
 - Logins reset when the server restarts
 
 # Key things to note abt messy backend
@@ -100,7 +104,7 @@ function loadmap(){
 loadmap();
 <script>
 
-Google Sheets:
+Old Google Sheet (no longer used; copy it into Supabase with "npm run import-sheet" in backendLogin/):
 https://docs.google.com/spreadsheets/d/1UK356MwkhS73fkZHGkeQwS_UBx9YpTf9dIunNaGbXLw/edit?gid=0#gid=0
 
 

@@ -1,5 +1,5 @@
 // Builds the HTML for displaying projects (map sidebar, update cards, recent list).
-// Uses textContent instead of innerHTML so sheet data can't inject HTML/scripts.
+// Uses textContent instead of innerHTML so project data can't inject HTML/scripts.
 
 function formatDate(date) {
   return date ? date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";

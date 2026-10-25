@@ -10,11 +10,14 @@ const app = express();
 const PORT = process.env.PORT || 3000; // 5000 (macOS AirPlay) and 5500 (Live Server) are usually taken
 const ROOT = path.join(__dirname, "..");
 
-// Apps Script that writes to the Google Sheet. Only the server sends to it, after checking the login.
-const SUBMIT_URL = process.env.SUBMIT_URL ||
-  "https://script.google.com/macros/s/AKfycbx6nM4ig2c6E6yFyk8bKNRXhStCPj7wIPoamrtNYJ57pxi_xC0Ni0qdy0tCBmUs10090A/exec";
-// optional: must match the Apps Script's SUBMIT_SECRET script property, if that's set
-const SUBMIT_SECRET = process.env.SUBMIT_SECRET || "";
+// Supabase database that stores projects. Only the server writes to it, after checking the login.
+// The secret key can do anything to the database, so it lives in backendLogin/.env (not committed to git)
+// instead of here. Copy .env.example to .env and paste your values in.
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY;
+if (!SUPABASE_URL || !SUPABASE_SECRET_KEY) {
+  console.warn("⚠️  SUPABASE_URL / SUPABASE_SECRET_KEY aren't set, so saving projects won't work. See backendLogin/.env.example");
+}
 
 const SESSION_COOKIE = "civiclink_session";
 const SESSION_HOURS = 8;
@@ -123,12 +126,8 @@ app.get("/api/session", (req, res) => {
   res.json({ loggedIn: !!session, username: session ? session.username : null });
 });
 
-// fields the browser may set; author, id, and date are decided by the server/Apps Script
-const PROJECT_FIELDS = ["name", "range", "date", "location", "description", "address", "type", "status"];
-const EDITABLE_FIELDS = ["name", "range", "location", "description", "address", "type", "status"];
-
-// Apps Script error codes -> HTTP status for the browser
-const APPS_SCRIPT_ERRORS = { not_found: 404, forbidden: 403, bad_request: 400 };
+// columns the browser may set; id, author, and submitted_at are decided by the server/database
+const PROJECT_FIELDS = ["name", "description", "address", "type", "status", "lng", "lat", "start_date", "end_date"];
 
 function pick(object, fields) {
   const picked = {};
@@ -138,45 +137,64 @@ function pick(object, fields) {
   return picked;
 }
 
-// sends a packet to the Apps Script and replies to the browser with the outcome
-async function forwardToAppsScript(packet, res, successBody) {
-  if (SUBMIT_SECRET) packet.secret = SUBMIT_SECRET;
-
-  try {
-    const response = await fetch(SUBMIT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(packet),
-    });
-    // Apps Script always answers 200, so check the status it reports
-    const result = await response.json().catch(() => null);
-    if (result && result.status === "success") return res.json({ success: true, ...successBody });
-
-    const message = result ? result.message : `HTTP ${response.status}`;
-    console.error("Apps Script error:", message);
-    const status = (result && APPS_SCRIPT_ERRORS[result.code]) || 502;
-    res.status(status).json({ success: false, message: status === 502 ? "Couldn't save the project." : message });
-  } catch (error) {
-    console.error("Apps Script request failed:", error);
-    res.status(502).json({ success: false, message: "Couldn't save the project." });
+class SupabaseError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
   }
 }
 
+// sends a request to the projects table (Supabase's REST API); resolves to the rows it returned/changed
+async function projectsRequest(method, query, body) {
+  const key = SUPABASE_SECRET_KEY || "";
+  const headers = { apikey: key, "Content-Type": "application/json", Prefer: "return=representation" };
+  if (key.startsWith("eyJ")) headers.Authorization = `Bearer ${key}`; // older service_role keys are JWTs
+
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/projects${query}`, {
+    method,
+    headers,
+    body: body && JSON.stringify(body),
+  });
+  const result = await response.json().catch(() => null);
+  if (!response.ok) throw new SupabaseError(response.status, (result && result.message) || `HTTP ${response.status}`);
+  return result;
+}
+
+// replies to the browser when a database request fails
+function sendSaveError(res, error) {
+  console.error("Supabase error:", error.message);
+  // 400 = the database rejected the data (e.g. an unknown type or status); anything else is our problem
+  if (error.status === 400) return res.status(400).json({ success: false, message: error.message });
+  res.status(502).json({ success: false, message: "Couldn't save the project." });
+}
+
 // new project: the logged-in engineer is recorded as the author
-app.post("/api/projects", requireLogin, (req, res) => {
-  const packet = pick(req.body, PROJECT_FIELDS);
-  packet.id = crypto.randomUUID(); // text id, so the sheet doesn't round it like a big number
-  packet.author = getSession(req).username;
-  forwardToAppsScript(packet, res, { id: packet.id });
+app.post("/api/projects", requireLogin, async (req, res) => {
+  const row = pick(req.body, PROJECT_FIELDS);
+  row.author = getSession(req).username;
+  try {
+    const [saved] = await projectsRequest("POST", "", row);
+    res.json({ success: true, id: saved.id });
+  } catch (error) {
+    sendSaveError(res, error);
+  }
 });
 
-// edit a project; the Apps Script only allows it if the project's author is the logged-in engineer
-app.put("/api/projects/:id", requireLogin, (req, res) => {
-  const packet = pick(req.body, EDITABLE_FIELDS);
-  packet.action = "update";
-  packet.id = req.params.id;
-  packet.author = getSession(req).username;
-  forwardToAppsScript(packet, res, { id: packet.id });
+// edit a project; only changes it if its author is the logged-in engineer
+app.put("/api/projects/:id", requireLogin, async (req, res) => {
+  const id = encodeURIComponent(req.params.id);
+  const author = encodeURIComponent(getSession(req).username);
+  try {
+    const updated = await projectsRequest("PATCH", `?id=eq.${id}&author=eq.${author}`, pick(req.body, PROJECT_FIELDS));
+    if (updated.length > 0) return res.json({ success: true, id: req.params.id });
+
+    // nothing changed: either there's no such project, or someone else wrote it
+    const existing = await projectsRequest("GET", `?id=eq.${id}&select=id`);
+    if (existing.length === 0) return res.status(404).json({ success: false, message: "Project not found" });
+    res.status(403).json({ success: false, message: "You can only edit your own projects" });
+  } catch (error) {
+    sendSaveError(res, error);
+  }
 });
 // #endregion
 

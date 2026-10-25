@@ -1,4 +1,4 @@
-// Submit page: click the map (or type an address) to place a project, then send it to the sheet.
+// Submit page: click the map (or type an address) to place a project, then save it to the database.
 // Edit mode (submit.html?edit=<id>): loads one of your own projects into the form and saves changes.
 
 const MARKER_CLICK_TOLERANCE = 25; // pixels; clicks this close to an existing marker don't move the pin

@@ -23,7 +23,18 @@ cd backendLogin
 npm install
 ```
 
-## 3. Start the server
+## 3. Connect the database (first time only)
+
+Projects are stored in a Supabase database.
+
+1. Create a free project at https://supabase.com.
+2. In the Supabase dashboard, open **SQL Editor > New query**, paste in everything from `supabase/schema.sql`, and press **Run**.
+3. Open **Project Settings > API Keys** (the project URL is under **Data API**) and copy:
+   - the **publishable** key (or the older **anon** key) and the project URL into `frontend/js/config.js`, where it says `PASTE YOUR SUPABASE VALUES HERE`. This key can only read, so it's fine for it to be public.
+   - the **secret** key (or the older **service_role** key) and the project URL into `backendLogin/.env`. Make that file by copying `backendLogin/.env.example`. Never put the secret key in `frontend/` or commit it, because it can change anything in the database. `.env` is already in `.gitignore`.
+4. Optional: copy the projects from the old Google Sheet. From the `backendLogin` folder, run `npm run import-sheet`. Running it again won't make duplicates.
+
+## 4. Start the server
 
 From the `backendLogin` folder:
 
@@ -39,11 +50,11 @@ When it's running you'll see:
 
 Leave this terminal open. The site only works while the server is running.
 
-## 4. Open the site
+## 5. Open the site
 
 Go to **http://localhost:3000** in your browser.
 
-## 5. Log in and submit a project
+## 6. Log in and submit a project
 
 1. Click **Login** in the navbar.
 2. Enter your username and password.
@@ -53,7 +64,7 @@ Go to **http://localhost:3000** in your browser.
 
 The Submit and Dashboard pages send you back to Login if you aren't logged in. You can only edit projects you submitted yourself. Logins reset whenever the server restarts.
 
-## 6. Stop the server
+## 7. Stop the server
 
 Press `Ctrl + C` in the terminal where the server is running.
 
@@ -82,15 +93,17 @@ To delete an account, remove its entry from `users.json`.
 | **`Cannot find module 'express'`** | Run `npm install` in the `backendLogin` folder. |
 | **"Too many attempts"** on login | There have been 10 failed logins from your computer. Wait 15 minutes or restart the server. |
 | Submitting says **"Your login expired"** | Sessions last 8 hours, and they also end when the server restarts. Log in again. |
+| Pages say **"Couldn't load projects"** | `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` in `frontend/js/config.js` are missing or wrong, or `supabase/schema.sql` hasn't been run. The browser console shows the exact error. |
+| Submitting says **"Couldn't save the project"** | `backendLogin/.env` is missing or has the wrong secret key. The server prints a warning when it starts if it's missing. Restart the server after changing `.env`. |
 
 ## Optional settings
 
-You can set these environment variables when starting the server:
+You can set these environment variables when starting the server (or put them in `backendLogin/.env`):
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `PORT` | `3000` | Port the site runs on |
-| `SUBMIT_URL` | the current Apps Script URL | Google Apps Script that writes submissions to the Google Sheet |
-| `SUBMIT_SECRET` | none | Must match the Apps Script's `SUBMIT_SECRET` script property if you've set one (see `apps-script/Code.gs`) |
+| `SUPABASE_URL` | none (set in `.env`) | Your Supabase project URL |
+| `SUPABASE_SECRET_KEY` | none (set in `.env`) | Supabase secret key the server uses to save projects |
 
 Example (Mac/Linux): `PORT=8080 npm start`. On Windows PowerShell: `$env:PORT=8080; npm start`
