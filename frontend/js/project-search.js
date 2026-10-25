@@ -5,11 +5,11 @@
 // match anywhere else (9), so title hits always come first.
 const SEARCH_FIELDS = [
   { weight: 10, text: (p) => p.name },
-  { weight: 3, text: (p) => PROJECT_TYPES[p.type] },
+  { weight: 3, text: (p) => typeLabels(p) },
   { weight: 3, text: (p) => PROJECT_STATUSES[p.status] },
   { weight: 3, text: (p) => p.address },
   { weight: 3, text: (p) => p.author },
-  { weight: 1, text: (p) => p.description },
+  { weight: 1, text: (p) => `${p.descriptionShort} ${p.descriptionLong}` },
   { weight: 1, text: (p) => `${formatDateRange(p)} ${formatDate(p.submittedAt)}` },
 ];
 

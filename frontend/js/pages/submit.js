@@ -13,7 +13,7 @@ const projectMarkers = [];
 
 async function initSubmitPage() {
   mapboxsearch.autofill({ accessToken: MAPBOX_TOKEN });
-  addOptions(document.getElementById("typeid"), PROJECT_TYPES);
+  addTypeCheckboxes(document.getElementById("typeids"));
   addOptions(document.getElementById("statusid"), PROJECT_STATUSES);
 
   const form = document.getElementById("projectForm");
@@ -49,6 +49,24 @@ function addOptions(select, options) {
   Object.entries(options).forEach(([value, label]) => select.add(new Option(label, value)));
 }
 
+// a labeled checkbox for each project type, colored like its map pin
+function addTypeCheckboxes(container) {
+  Object.entries(PROJECT_TYPES).forEach(([value, label]) => {
+    const row = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "type";
+    checkbox.value = value;
+    checkbox.style.accentColor = TYPE_COLORS[value];
+    row.append(checkbox, label);
+    container.appendChild(row);
+  });
+}
+
+function typeCheckboxes() {
+  return [...document.querySelectorAll("#typeids input[name=type]")];
+}
+
 // #region edit mode
 // the project with this id if the logged-in engineer wrote it; otherwise explains and goes back
 function findOwnProject(projects, id) {
@@ -70,8 +88,10 @@ function startEditing(map, project) {
   document.getElementById("range1id").value = formatDay(project.startDate);
   document.getElementById("range2id").value = formatDay(project.endDate);
   document.getElementById("statusid").value = project.statusSetting;
-  document.getElementById("typeid").value = project.type;
-  document.getElementById("descriptionid").value = project.description;
+  typeCheckboxes().forEach((checkbox) => { checkbox.checked = project.types.includes(checkbox.value); });
+  document.getElementById("descriptionshortid").value = project.descriptionShort;
+  document.getElementById("descriptionlongid").value = project.descriptionLong;
+  document.getElementById("resourcesid").value = project.resources.join("\n");
   document.getElementById("addressid").value = project.address;
 
   setPin(map, { lng: project.lng, lat: project.lat });
@@ -137,6 +157,12 @@ async function resolveLocation(typedAddress) {
 
 async function handleSubmit(map, form) {
   const submitButton = document.getElementById("submitid");
+  const types = typeCheckboxes().filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value);
+  if (types.length === 0) {
+    alert("Please choose at least one project type.");
+    return;
+  }
+
   const { lngLat, address } = await resolveLocation(document.getElementById("addressid").value.trim());
 
   if (!lngLat) {
@@ -151,9 +177,11 @@ async function handleSubmit(map, form) {
   const project = {
     id: editingProject ? editingProject.id : null, // new ids come from the server
     name: document.getElementById("nameid").value,
-    description: document.getElementById("descriptionid").value,
+    descriptionShort: document.getElementById("descriptionshortid").value,
+    descriptionLong: document.getElementById("descriptionlongid").value,
+    resources: document.getElementById("resourcesid").value.split("\n").map((line) => line.trim()).filter(Boolean),
     address,
-    type: document.getElementById("typeid").value,
+    types,
     status: projectStatus(statusSetting, startDate, endDate),
     statusSetting,
     author: currentUser,

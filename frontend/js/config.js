@@ -7,8 +7,8 @@ const MAPBOX_TOKEN = "pk.eyJ1IjoiY2l2aWMtbGluayIsImEiOiJjbWdwbzd6c2kyY3dyMmpuMnp
 // which checks the login and writes with the secret key (see backendLogin/server.js).
 // Find both values in the Supabase dashboard > Project Settings > API Keys / Data API.
 // ===== PASTE YOUR SUPABASE VALUES HERE =====
-const SUPABASE_URL = "https://YOUR-PROJECT-ID.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "PASTE-YOUR-PUBLISHABLE-OR-ANON-KEY-HERE"; // safe to share: it can only read
+const SUPABASE_URL = "https://sompmpnkupnitlchtghh.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_KPinMWLjcDMoqblMMxxoNA_-Xu1wWMv"; // safe to share: it can only read
 // ===========================================
 
 // Login/submit API (backendLogin/server.js), served from the same address as the site

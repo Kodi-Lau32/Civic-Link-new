@@ -298,6 +298,7 @@ body {
 
 .map-sidebar-type {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   color: #555;

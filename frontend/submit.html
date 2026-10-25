@@ -46,19 +46,24 @@
           <option value="" selected>Automatic (from dates)</option>
           <!-- options are added from PROJECT_STATUSES by js/pages/submit.js -->
         </select>
+
+        <h3>Full description (optional)</h3>
+        <textarea class="inputs" id="descriptionlongid" placeholder="Shown on the project's own page. Ex: The city plans to..."></textarea>
+
+        <h3>Sources (optional, one per line)</h3>
+        <textarea class="inputs" id="resourcesid" placeholder="Ex: https://city.gov/news/bridge-repair"></textarea>
         <br>
         <!--<input class="inputs" type="date" id="dateid" placeholder="Put date here" required></input> -->
       </div>
     
       <div class="right-info">
-        <h3>Project type</h3>
-        <select class="inputs" id="typeid" required>
-          <option value="" disabled selected>Choose a type...</option>
-          <!-- options are added from PROJECT_TYPES by js/pages/submit.js -->
-        </select>
+        <h3>Project type (choose one or more)</h3>
+        <div class="type-checkboxes" id="typeids">
+          <!-- a checkbox for each of PROJECT_TYPES is added by js/pages/submit.js -->
+        </div>
 
-        <h3>Description</h3>
-        <textarea class="inputs" id="descriptionid" placeholder="Ex: This project's purpose is to..." required></textarea> 
+        <h3>Short description</h3>
+        <textarea class="inputs" id="descriptionshortid" placeholder="Ex: This project's purpose is to..." required></textarea> 
         
         <h3>Address (optional)</h3> 
         <input class="inputs" id="addressid" type="text" autocomplete= "address-line1" placeholder="Ex: 1234 Hollywood Dr."></input>

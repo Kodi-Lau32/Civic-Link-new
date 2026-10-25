@@ -59,9 +59,9 @@ function toProjectRow(r, id) {
   return {
     id,
     name: r.name || "",
-    description: r.description || "",
+    description_short: r.description || "",
     address: r.address || "",
-    type: parseKey(r.type, TYPES, TYPE_LABELS) || "construction",
+    type: [parseKey(r.type, TYPES, TYPE_LABELS) || "construction"],
     status: parseKey(r.status, STATUSES, STATUS_LABELS),
     author: r.author || null,
     lng: Number.isFinite(lng) ? lng : null,

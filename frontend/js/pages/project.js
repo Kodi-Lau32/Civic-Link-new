@@ -40,11 +40,7 @@ function message(text) {
 function renderArticle(project, session) {
   const meta = document.createElement("div");
   meta.className = "featured-meta";
-  const badge = document.createElement("span");
-  badge.className = "type-badge";
-  badge.style.background = TYPE_COLORS[project.type];
-  badge.textContent = PROJECT_TYPES[project.type];
-  meta.append(badge, PROJECT_STATUSES[project.status]);
+  meta.append(...renderTypeBadges(project), PROJECT_STATUSES[project.status]);
 
   const title = document.createElement("h1");
   title.className = "project-title";
@@ -77,16 +73,45 @@ function renderArticle(project, session) {
 
   parts.push(renderTimeline(project), renderFacts(project));
 
-  if (project.description) {
-    const heading = document.createElement("h2");
-    heading.className = "project-subheading";
-    heading.textContent = "About this project";
+  // the full write-up; projects without one show their short description instead
+  const about = project.descriptionLong || project.descriptionShort;
+  if (about) {
     const description = document.createElement("p");
     description.className = "project-description";
-    description.textContent = project.description;
-    parts.push(heading, description);
+    description.textContent = about;
+    parts.push(subheading("About this project"), description);
+  }
+
+  if (project.resources.length > 0) {
+    const list = document.createElement("ul");
+    list.className = "project-resources";
+    list.append(...project.resources.map(renderResource));
+    parts.push(subheading("Sources"), list);
   }
   return parts;
+}
+
+function subheading(text) {
+  const heading = document.createElement("h2");
+  heading.className = "project-subheading";
+  heading.textContent = text;
+  return heading;
+}
+
+// a source: web addresses become links (only http/https, so a stored "javascript:" can't run), anything else is text
+function renderResource(resource) {
+  const item = document.createElement("li");
+  if (/^https?:\/\//i.test(resource)) {
+    const link = document.createElement("a");
+    link.href = resource;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = resource;
+    item.appendChild(link);
+  } else {
+    item.textContent = resource;
+  }
+  return item;
 }
 
 // grid of key facts
@@ -109,7 +134,7 @@ function renderFacts(project) {
   add("Starts", formatDate(project.startDate));
   add("Ends", formatDate(project.endDate));
   add("Duration", durationText(project));
-  add("Type", PROJECT_TYPES[project.type]);
+  add(project.types.length > 1 ? "Types" : "Type", typeLabels(project));
   add("Status", PROJECT_STATUSES[project.status]);
   return facts;
 }
@@ -140,7 +165,7 @@ function renderTimeline(project) {
     const fill = document.createElement("div");
     fill.className = "project-timeline-fill";
     fill.style.width = `${percent}%`;
-    fill.style.background = TYPE_COLORS[project.type];
+    fill.style.background = typeColor(project);
     bar.appendChild(fill);
 
     const ends = document.createElement("div");
@@ -187,7 +212,7 @@ function showProjectMap(project) {
     cooperativeGestures: true, // scrolling the page doesn't zoom the map
   });
   map.addControl(new mapboxgl.NavigationControl(), "top-right");
-  new mapboxgl.Marker({ color: TYPE_COLORS[project.type] }).setLngLat([project.lng, project.lat]).addTo(map);
+  new mapboxgl.Marker({ color: typeColor(project) }).setLngLat([project.lng, project.lat]).addTo(map);
 }
 
 // closest other projects (or the newest ones, if this project has no location)

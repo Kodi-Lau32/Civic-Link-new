@@ -127,7 +127,9 @@ app.get("/api/session", (req, res) => {
 });
 
 // columns the browser may set; id, author, and submitted_at are decided by the server/database
-const PROJECT_FIELDS = ["name", "description", "address", "type", "status", "lng", "lat", "start_date", "end_date"];
+const PROJECT_FIELDS = [
+  "name", "description_short", "description_long", "resources", "address", "type", "status", "lng", "lat", "start_date", "end_date",
+];
 
 function pick(object, fields) {
   const picked = {};

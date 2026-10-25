@@ -17,11 +17,12 @@ A website aimed to let city engineers post construction updates about their comm
 Database: Supabase table "projects", created by supabase/schema.sql (paste it into Supabase > SQL Editor > Run).
 The site reads it with the publishable key (frontend/js/config.js); the server writes it with the secret key (backendLogin/.env).
 
-Adding a project type: add it to PROJECT_TYPES and TYPE_COLORS (projects.js), and to the type check in supabase/schema.sql.
-Adding a status: add it to PROJECT_STATUSES (projects.js) and to the status check in supabase/schema.sql.
-(To change a check on an existing database, run in the SQL Editor, e.g.:
-  alter table projects drop constraint projects_type_check;
-  alter table projects add constraint projects_type_check check (type in ('construction', ..., 'new_type'));)
+Adding a project type: add it to PROJECT_TYPES and TYPE_COLORS (projects.js), then in the Supabase SQL Editor re-run the
+last two lines of supabase/schema.sql (projects_type_check) with the new key added to the list.
+Adding a status: add it to PROJECT_STATUSES (projects.js) and to the status check in supabase/schema.sql, e.g.:
+  alter table projects drop constraint projects_status_check;
+  alter table projects add constraint projects_status_check check (status in ('proposed', ..., 'new_status'));
+A project can have several types (tags); the first one sets its color on the map.
 Map filters come from FILTER_GROUPS (map.js); the sidebar content is buildProjectDetails (render.js).
 
 Shared styles go in css/index.css; page-only styles in that page's css file.

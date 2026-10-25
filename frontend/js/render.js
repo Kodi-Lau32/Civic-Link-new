@@ -39,8 +39,19 @@ function authorLine(project) {
   return project.author ? [labeledLine("p", "Submitted by", project.author)] : [];
 }
 
-// content of the map sidebar shown when a project is clicked; color is the project's pin color
-function buildProjectDetails(project, color) {
+// a colored label for each of the project's tags (Updates page stories and the project page)
+function renderTypeBadges(project) {
+  return project.types.map((type) => {
+    const badge = document.createElement("span");
+    badge.className = "type-badge";
+    badge.style.background = TYPE_COLORS[type];
+    badge.textContent = PROJECT_TYPES[type];
+    return badge;
+  });
+}
+
+// content of the map sidebar shown when a project is clicked
+function buildProjectDetails(project) {
   const box = document.createElement("div");
 
   const title = document.createElement("h3");
@@ -48,10 +59,12 @@ function buildProjectDetails(project, color) {
 
   const type = document.createElement("div");
   type.className = "map-sidebar-type";
-  const swatch = document.createElement("span");
-  swatch.className = "map-legend-dot";
-  swatch.style.background = color;
-  type.append(swatch, PROJECT_TYPES[project.type]);
+  project.types.forEach((tag) => {
+    const swatch = document.createElement("span");
+    swatch.className = "map-legend-dot";
+    swatch.style.background = TYPE_COLORS[tag];
+    type.append(swatch, PROJECT_TYPES[tag]);
+  });
 
   box.append(
     title,
@@ -59,7 +72,7 @@ function buildProjectDetails(project, color) {
     labeledLine("p", "Status", PROJECT_STATUSES[project.status]),
     labeledLine("p", "Dates", formatDateRange(project)),
     labeledLine("p", "Address", project.address),
-    labeledLine("p", "Description", project.description),
+    labeledLine("p", "Description", project.descriptionShort),
     labeledLine("p", "Submitted", formatDate(project.submittedAt)),
     ...authorLine(project)
   );
@@ -68,7 +81,7 @@ function buildProjectDetails(project, color) {
 
 // map picture for a project, from Mapbox's static image API (width/height in CSS pixels)
 function staticMapUrl(project, width, height) {
-  const color = TYPE_COLORS[project.type].replace("#", "");
+  const color = typeColor(project).replace("#", "");
   const point = `${project.lng},${project.lat}`;
   return `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/pin-l+${color}(${point})/${point},14,0/` +
     `${width}x${height}@2x?access_token=${MAPBOX_TOKEN}`;
@@ -99,18 +112,14 @@ function renderFeaturedStory(project, lead) {
 
   const meta = document.createElement("div");
   meta.className = "featured-meta";
-  const badge = document.createElement("span");
-  badge.className = "type-badge";
-  badge.style.background = TYPE_COLORS[project.type];
-  badge.textContent = PROJECT_TYPES[project.type];
-  meta.append(badge, [PROJECT_STATUSES[project.status], formatDate(project.submittedAt)].filter(Boolean).join(" · "));
+  meta.append(...renderTypeBadges(project), [PROJECT_STATUSES[project.status], formatDate(project.submittedAt)].filter(Boolean).join(" · "));
 
   const title = document.createElement("h3");
   title.textContent = project.name;
 
   const description = document.createElement("p");
   description.className = "featured-description";
-  description.textContent = project.description;
+  description.textContent = project.descriptionShort;
 
   const details = document.createElement("p");
   details.className = "featured-details";
@@ -138,12 +147,12 @@ function renderProjectCard(project) {
 
   card.append(
     title,
-    labeledLine("p", "Type", PROJECT_TYPES[project.type]),
+    labeledLine("p", project.types.length > 1 ? "Types" : "Type", typeLabels(project)),
     labeledLine("p", "Status", PROJECT_STATUSES[project.status]),
     labeledLine("p", "Location", project.address),
     labeledLine("p", "Date Range", formatDateRange(project)),
     labeledLine("p", "Date Submitted", formatDate(project.submittedAt)),
-    labeledLine("p", "Description", project.description),
+    labeledLine("p", "Description", project.descriptionShort),
     ...authorLine(project)
   );
   return card;

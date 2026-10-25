@@ -7,14 +7,14 @@
 const DETAIL_ZOOM_START = 9;  // below this: dots only
 const DETAIL_ZOOM_END = 11;   // above this: pins only
 
-// checkbox groups in the legend; key is the project field each group filters on
+// checkbox groups in the legend; key is the project field each group filters on (a value or a list)
 const FILTER_GROUPS = [
-  { key: "type", title: "Type", options: PROJECT_TYPES, colors: TYPE_COLORS },
+  { key: "types", title: "Type", options: PROJECT_TYPES, colors: TYPE_COLORS },
   { key: "status", title: "Status", options: PROJECT_STATUSES },
 ];
 
 const DOTS_SOURCE = "project-dots";
-// map -> { entries: [{ project, marker }], features, hidden: { type: Set, status: Set }, selected, sidebar }
+// map -> { entries: [{ project, marker }], features, hidden: { types: Set, status: Set }, selected, sidebar }
 const mapState = new WeakMap();
 
 function createMap() {
@@ -56,20 +56,21 @@ function addSearchBox(map) {
 function addProjectMarker(map, project) {
   const state = mapState.get(map);
   const index = state.entries.length;
-  const color = TYPE_COLORS[project.type];
+  const color = typeColor(project);
+  const hidden = isFilteredOut(state, project);
 
   const marker = new mapboxgl.Marker({ color })
     .setLngLat([project.lng, project.lat])
     .addTo(map);
   marker.getElement().style.cursor = "pointer";
   marker.getElement().addEventListener("click", () => showProject(map, index));
-  marker.getElement().classList.toggle("marker-filtered-out", isFilteredOut(state, project));
+  marker.getElement().classList.toggle("marker-filtered-out", hidden);
 
   state.entries.push({ project, marker });
   state.features.push({
     type: "Feature",
     geometry: { type: "Point", coordinates: [project.lng, project.lat] },
-    properties: { index, color, type: project.type, status: project.status },
+    properties: { index, color, hidden },
   });
   refreshDots(map);
   updateMarkerDetail(map);
@@ -133,8 +134,10 @@ function addFilterLegend(map) {
   map.getContainer().appendChild(legend);
 }
 
+// hidden if, in some group, all of the project's values are unchecked
+// (so a project tagged construction + data center shows while either one is checked)
 function isFilteredOut(state, project) {
-  return FILTER_GROUPS.some((group) => state.hidden[group.key].has(project[group.key]));
+  return FILTER_GROUPS.some((group) => [].concat(project[group.key]).every((value) => state.hidden[group.key].has(value)));
 }
 
 function setFilterValueShown(map, key, value, shown) {
@@ -150,13 +153,10 @@ function applyFilters(map) {
   state.entries.forEach(({ project, marker }, index) => {
     const hidden = isFilteredOut(state, project);
     marker.getElement().classList.toggle("marker-filtered-out", hidden);
+    state.features[index].properties.hidden = hidden;
     if (hidden && state.selected === index) closeSidebar(map);
   });
-
-  if (map.getLayer(DOTS_SOURCE)) {
-    map.setFilter(DOTS_SOURCE, ["all", ...FILTER_GROUPS.map((group) =>
-      ["!", ["in", ["get", group.key], ["literal", [...state.hidden[group.key]]]]])]);
-  }
+  refreshDots(map);
 }
 // #endregion
 
@@ -192,7 +192,7 @@ function showProject(map, index) {
   const state = mapState.get(map);
   const { project } = state.entries[index];
 
-  state.sidebar.content.replaceChildren(buildProjectDetails(project, TYPE_COLORS[project.type]));
+  state.sidebar.content.replaceChildren(buildProjectDetails(project));
   state.sidebar.element.classList.add("open");
   state.sidebar.element.scrollTop = 0;
   setSelected(state, index);
@@ -218,6 +218,7 @@ function addDotLayer(map) {
     id: DOTS_SOURCE,
     type: "circle",
     source: DOTS_SOURCE,
+    filter: ["!", ["get", "hidden"]], // filtered-out projects (see applyFilters)
     paint: {
       "circle-color": ["get", "color"],
       "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 3, DETAIL_ZOOM_END, 7],
