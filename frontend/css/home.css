@@ -1,99 +1,184 @@
-body {
-  background-color: #c5c5c5;
-}
+body { background: var(--canvas); }
 
-
-/* "submit construction updates here" */
 .headerbox-home {
-  position: relative;
-  display: block;
-  left: calc(50% - 225px);
-      
-  top: 80px;
-  width: 450px;
-  height: 150px;
-  padding: 10px 20px;
-  border-radius: 5px;
-
-  text-align: center;
-  background: #aaaaaa;
-  color: white;
-
-  box-shadow: 0 5px 5px rgba(15, 15, 15, 0.3);
+  width: min(1160px, calc(100% - 40px));
+  margin: 100px auto 26px;
+  padding: clamp(32px, 6vw, 72px) clamp(24px, 6vw, 72px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(120deg, #fff 0%, #f8f9fa 78%, #edf2f6 150%);
+  color: var(--ink);
+  text-align: left;
+}
+.headerbox-home h2 {
+  max-width: 780px;
+  margin: 0;
+  color: var(--slate-deep);
+  font-size: clamp(2.3rem, 6vw, 4.2rem);
+  font-weight: 780;
+  letter-spacing: -.065em;
+  line-height: 1.02;
 }
 .headerbox-home h4 {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  font-weight: 600;
+  max-width: 610px;
+  margin: 18px 0 26px;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-weight: 450;
+  line-height: 1.7;
 }
+#submit-button { margin-top: 2px; }
 
-#submit-button {
-  top: 10px;
-}
-    
-
-/* Content boxes: map and updates outline */
 .contentbox {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  gap: 29px; /*THIS CONTROLS THE GAP BETWEEN MAP AND UPDATES*/
-  padding: 0 20px 140px;
+  display: grid;
+  width: min(1160px, calc(100% - 40px));
+  grid-template-columns: minmax(0, 1.75fr) minmax(280px, .85fr);
+  align-items: stretch;
+  gap: 18px;
+  margin: 0 auto 42px;
+  padding: 0;
 }
-
 .samplebox {
-  position: relative;
-  display: block;
-  
-  top: 110px;
+  min-width: 0;
   padding: 10px;
-  border-radius: 10px;
-  
-  box-shadow: 0 5px 5px rgba(15, 15, 15, 0.3);
-  background: #aaaaaa;
-  color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+#map-container { width: auto; min-width: 0; height: clamp(420px, 58vh, 650px); padding: 9px; }
+#map-container #map { width: 100% !important; height: 100% !important; margin: 0 !important; overflow: hidden; border-radius: 9px !important; }
+#updates {
+  width: auto;
+  min-width: 0;
+  height: clamp(420px, 58vh, 650px);
+  min-height: 0;
+  padding: 21px;
+  overflow: auto;
+  border-top: 3px solid var(--accent);
+  word-wrap: break-word;
+}
+#updates h4 { margin: 0; 
+  color: var(--slate-deep); 
+  font-size: .76rem; 
+  font-weight: 800; 
+  letter-spacing: .12em; 
 }
 
-  /* map grows with the window, up to 1000 x 650 */
-  #map-container{
-    width: min(1000px, calc(100vw - 360px));
-    min-width: 400px;
-    height: min(650px, calc(100vh - 330px));
-    min-height: 400px;
+#updates hr { 
+  height: 1px; 
+  margin: 13px 0; 
+  border: 0; 
+  background: var(--line); 
+}
+
+#updates::-webkit-scrollbar { 
+  width: 8px; 
+}
+#updates::-webkit-scrollbar-thumb { 
+  border: 2px solid var(--surface); 
+  border-radius: 99px; 
+  background: #c5ced7; 
+}
+
+.newsletter-section {
+  display: grid;
+  width: min(1160px, calc(100% - 40px));
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 440px);
+  align-items: center;
+  gap: 32px;
+  margin: 0 auto 72px;
+  padding: clamp(26px, 4vw, 42px);
+  border: 1px solid #d5dfe6;
+  border-radius: 18px;
+  background: #f9fafb;
+}
+.newsletter-copy h2 { 
+  margin: 0; 
+  color: var(--slate-deep); 
+  font-size: clamp(1.45rem, 3vw, 1.9rem); 
+  letter-spacing: -.04em; 
+  line-height: 1.2; 
+}
+.newsletter-copy p { 
+  max-width: 570px; 
+  margin: 9px 0 0; 
+  color: #52647a; 
+  line-height: 1.65; 
+}
+.newsletter-form { 
+  display: flex; 
+  align-items: flex-end; 
+  gap: 10px; 
+}
+.newsletter-field { 
+  flex: 1 1 auto; 
+  min-width: 0; 
+}
+.newsletter-field label { 
+  display: block; 
+  margin: 0 0 6px; 
+  color: var(--slate-deep); 
+  font-size: .86rem; 
+  font-weight: 700; 
+}
+.newsletter-field input { 
+  width: 100%; 
+  min-height: 46px; 
+  padding: 10px 13px; 
+  border: 1px solid #cbd4de; 
+  border-radius: 9px; 
+  background: white; 
+  color: var(--ink); 
+}
+.newsletter-form button { 
+  min-height: 46px; 
+  padding: 0 16px; 
+  border: 1px solid var(--slate-deep); 
+  border-radius: 9px; 
+  background: var(--slate-deep); 
+  color: white; 
+  font-weight: 700; 
+  cursor: pointer; 
+}
+.newsletter-form button:hover { 
+  background: #1b3049; 
+}
+
+@media (max-width: 900px) {
+  .contentbox { 
+    grid-template-columns: minmax(0, 1fr); 
   }
-
-  #updates {
-  width: 260px;          /* fixed width */
-  height: min(650px, calc(100vh - 330px)); /* same height as the map */
-  min-height: 400px;
-  overflow-y: auto;      /* vertical scrollbar appears if content is too tall */
-  overflow-x: hidden;    /* prevent horizontal scrolling */
-  word-wrap: break-word; /* break long words so they stay inside the box */
-  padding: 10px;
-  box-sizing: border-box;
-  background: #aaaaaa;   /* optional background for visibility */
-  color: #ffffff;        /* optional text color */
+  #map-container { 
+    height: min(58vh, 560px); 
+    min-height: 380px; 
+  }
+  #updates { 
+    height: auto; 
+    max-height: 400px; 
+  }
+  .newsletter-section { 
+    grid-template-columns: minmax(0, 1fr); 
+    gap: 22px; 
+  }
 }
-
-/* Optional: make the scrollbar look nicer */
-#updates::-webkit-scrollbar {
-  width: 8px;
-}
-
-#updates::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-}
-
-#updates::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-     
-
-hr {
-  margin-top: 15px;
-  border: 0;
-  height: 1px;
-  background-color: white; 
-  border-top: 1px solid rgba(255,255,255,0.6);
+@media (max-width: 560px) {
+  .headerbox-home { 
+    width: calc(100% - 28px); 
+    margin-top: 78px; 
+    padding: 30px 22px; 
+    border-radius: 16px; 
+  }
+  .contentbox, .newsletter-section { 
+    width: calc(100% - 28px); 
+  }
+  #map-container { 
+    min-height: 320px; 
+    height: 52vh; 
+  }
+  .newsletter-form { 
+    align-items: stretch; 
+    flex-direction: column; 
+  }
 }

@@ -1,184 +1,169 @@
-body{
-  background-color: #cccccc;
-  background-attachment:fixed;
-  background-size: 100%;
+body { 
+  background: var(--canvas); 
+}
+.submit { 
+  width: min(1040px, calc(100% - 40px)); 
+  margin: 0 auto 68px; 
+}
+#projectForm { 
+  margin: 0; 
+}
+.general-info { 
+  display: grid; 
+  grid-template-columns: repeat(2, minmax(0, 1fr)); 
+  gap: 26px; 
+  width: 100%; 
+  min-height: 0; 
+  margin: 0; 
+  padding: clamp(22px, 4vw, 34px); 
+  border: 1px solid var(--line); 
+  border-radius: 15px; 
+  background: var(--surface); 
+  color: var(--ink); 
+  text-align: left; 
+}
+.left-info, .right-info { 
+  display: flex; 
+  min-width: 0; 
+  flex-direction: column; 
+  margin: 0; 
+}
+.general-info h3, .map-selection h3 { 
+  margin: 16px 0 7px; 
+  color: var(--slate-deep); 
+  font-size: .9rem; 
+  font-weight: 750; 
+  line-height: 1.4; 
+  text-indent: 0; 
+}
+.left-info h3:first-of-type, .right-info h3:first-of-type { 
+  margin-top: 0; 
 }
 
-h3{
-  margin-top: 20px; 
-  margin-bottom: 10px;
-  font-size: 1rem;
-  font-weight: 650;
-  text-align: left;
-  color: white;
+.general-info h2 { 
+  display: none; 
 }
-
-/* general info form */
-.general-info {
-  position: relative;
-  display: flex;
-  flex-direction: ROW;
-
-  left: calc(50% - 400px);
-  
-  margin-top: 20px;
-  top: 120px;
-  width: 800px;
-  min-height: 400px;
-  padding: 20px;
-  border-radius: 10px;
-
-  text-align: center;
-  background: #aaaaaa;
-  color: white;
-  border: none;
-
-  border: 3px dashed #dad9d9;
-  box-shadow: 0 5px 5px rgba(15, 15, 15, 0.3);
+.inputs { 
+  display: block; 
+  width: 100%; 
+  min-height: 45px; 
+  margin: 0; 
+  padding: 10px 12px; 
+  border: 1px solid #cbd4de; 
+  border-radius: 8px; 
+  background: white; 
+  color: var(--ink); 
+  font-size: .93rem; 
+  font-weight: 500; 
+  text-indent: 0; 
 }
-
-.inputs {
-  position: relative;
-  display: block;
-  
-  height: 50px;
-  width: 350px;
-  border-radius: 50px;
-
-  color: rgb(75, 75, 75);
-  font-weight: 700;
-  text-indent: 5%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+.inputs::placeholder { 
+  color: #738197; 
+  opacity: 1; 
 }
-  .inputs:focus{
-    outline: 3px solid white;
-  }
-  .general-info h3{
-    text-indent: 10px;
-  }
-  .general-info h2 {
-    margin-top: 20px;
-    padding-bottom: 20px;
-    text-shadow:
-    -1px -1px #555555, 
-    1px -1px #555555,
-    -1px 1px #555555,
-    1px 1px #555555;
-  }
-  #descriptionshortid, #descriptionlongid, #resourcesid {
-    height: 150px;
-    border-radius: 15px;
-
-    text-wrap: wrap;
-    font-size: 0.8rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-
-
-  #descriptionlongid {
-    height: 220px;
-  }
-  #resourcesid {
-    height: 90px;
-  }
-
-  /* project type checkboxes */
-  .type-checkboxes {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding-left: 10px;
-    text-align: left;
-  }
-  .type-checkboxes label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .type-checkboxes input {
-    width: 18px;
-    height: 18px;
-  }
-
-  /* left submit fields */
-  .left-info {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .right-info {
-    display: flex;
-    flex-direction: column;
-    margin-left: 40px;
-  }
-
-.map-selection {
-  position: relative;
-  display: block;
-
-  left: calc(50% - 350px);
-  
-  top: 150px;
-  width: 700px;
-  height: 550px;
-  padding: 20px;
-  border-radius: 10px;
-
-  text-align: center;
-  background: #aaaaaa;
-  color: white;
-  border: none;
-
-  border: 3px dashed #dad9d9;
-  box-shadow: 0 5px 5px rgba(15, 15, 15, 0.3);
+.inputs:focus-visible { 
+  border-color: var(--accent); 
+  outline: 3px solid rgba(91, 124, 153, .22); 
+  outline-offset: 1px; 
 }
-  .map-selection h3{
-    text-indent: 30px;
+#descriptionshortid, #descriptionlongid, #resourcesid { 
+  min-height: 112px; 
+  padding-top: 11px; 
+  border-radius: 8px; 
+  font-family: inherit; 
+  font-size: .93rem; 
+  line-height: 1.5; 
+  resize: vertical; 
+}
+#descriptionlongid { 
+  min-height: 180px; 
+}
+#resourcesid { 
+  min-height: 82px; 
+}
+.type-checkboxes { 
+  display: grid; 
+  grid-template-columns: repeat(2, minmax(0, 1fr)); 
+  gap: 8px; 
+  padding: 0; 
+  text-align: left; 
+}
+.type-checkboxes label { 
+  display: flex; 
+  min-height: 41px; 
+  align-items: center; 
+  gap: 9px; 
+  padding: 8px 10px; 
+  border: 1px solid var(--line); 
+  border-radius: 8px; 
+  background: #fafbfd; 
+  color: #40536b; 
+  font-size: .87rem; 
+  font-weight: 600; 
+  cursor: pointer; 
+}
+.type-checkboxes label:has(input:checked) { 
+  border-color: #a9bdcc; 
+  background: var(--accent-soft); 
+  color: var(--slate-deep); 
+}
+.type-checkboxes input { 
+  width: 18px; 
+  height: 18px; 
+  flex: 0 0 auto; 
+  accent-color: var(--slate-deep); 
+}
+.map-selection { 
+  width: 100%; 
+  margin: 19px 0 0; 
+  padding: clamp(18px, 3vw, 26px); 
+  border: 1px solid var(--line); 
+  border-radius: 15px; 
+  background: var(--surface); 
+  color: var(--ink); 
+  text-align: left; 
+}
+.map-selection h3 { 
+  margin: 0 0 13px; 
+}
+.map-selection-container { 
+  display: grid; 
+  gap: 10px; 
+}
+#geocoder-container { 
+  max-width: 100%; 
+}
+#map, #map-test { 
+  width: 100%; 
+  height: clamp(300px, 44vw, 440px); 
+  border: 1px solid var(--line); 
+  border-radius: 10px; 
+  background-color: #e9eef2; 
+}
+#submitid { 
+  display: flex; 
+  min-width: 150px; 
+  min-height: 46px; 
+  margin: 21px auto 0; 
+  padding-inline: 21px; 
+}
+@media (max-width: 760px) {
+  .submit { 
+    width: calc(100% - 28px); 
   }
-
-  #map {
-  top: 20px;
-
-  left: calc(50%);
-  transform: translateX(-50%);
-
-  width: 600px;
-  height: 400px;
-  border-radius: 10px;
-  border: 3px solid #c0c0c0;
-  background-color: rgb(190, 211, 187);
+  .general-info { 
+    grid-template-columns: minmax(0, 1fr); 
+    gap: 19px; 
   }
-
-  #map-test{
-  top: 20px;
-
-  width: 100%;
-  height: 400px;
-  border-radius: 10px;
-  border: 3px solid #c0c0c0;
-  background-color: rgb(190, 211, 187);
+  .type-checkboxes { 
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
   }
-
-
-
-  /* submit button */
-  #submitid {
-    top: 180px;
-    width: 150px;
-    height: 50px;
-
-    left: calc(50%);
-    transform: translateX(-50%);
-
-    color: #696969;
-    font-weight: 600;
-    font-size: 1rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+@media (max-width: 440px) {
+  .type-checkboxes { 
+    grid-template-columns: minmax(0, 1fr); 
   }
-
-
-
-
-  
+  #map, #map-test { 
+    height: 290px; 
+  }
+}

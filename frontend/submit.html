@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Engineer Form</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Submit a Project | CivicLink</title>
   <link rel="stylesheet" href="css/index.css">
   <link rel="stylesheet" href="css/submit.css">
   <link href='https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css' rel='stylesheet' />
@@ -34,24 +36,24 @@
        
        <div class="left-info">
         <h3>Project name</h3>
-        <input class="inputs" id="nameid" placeholder="Ex:" required></input>
+        <input class="inputs" id="nameid" aria-label="Project name" placeholder="Ex: Main Street bridge repair" required>
         <h3>Start date</h3>
-        <input class="inputs" type="date" id="range1id" placeholder="Put est start here" required></input>
+        <input class="inputs" type="date" id="range1id" aria-label="Project start date" required>
         <h3>Est. completion date</h3>
       
-        <input class="inputs" type="date" id="range2id" placeholder="Put est end here" required></input>
+        <input class="inputs" type="date" id="range2id" aria-label="Estimated completion date" required>
 
         <h3>Status</h3>
-        <select class="inputs" id="statusid">
+        <select class="inputs" id="statusid" aria-label="Project status">
           <option value="" selected>Automatic (from dates)</option>
           <!-- options are added from PROJECT_STATUSES by js/pages/submit.js -->
         </select>
 
         <h3>Full description (optional)</h3>
-        <textarea class="inputs" id="descriptionlongid" placeholder="Shown on the project's own page. Ex: The city plans to..."></textarea>
+        <textarea class="inputs" id="descriptionlongid" aria-label="Full project description" placeholder="Shown on the project's own page. Ex: The city plans to..."></textarea>
 
         <h3>Sources (optional, one per line)</h3>
-        <textarea class="inputs" id="resourcesid" placeholder="Ex: https://city.gov/news/bridge-repair"></textarea>
+        <textarea class="inputs" id="resourcesid" aria-label="Project sources, one per line" placeholder="Ex: https://city.gov/news/bridge-repair"></textarea>
         <br>
         <!--<input class="inputs" type="date" id="dateid" placeholder="Put date here" required></input> -->
       </div>
@@ -63,10 +65,10 @@
         </div>
 
         <h3>Short description</h3>
-        <textarea class="inputs" id="descriptionshortid" placeholder="Ex: This project's purpose is to..." required></textarea> 
+        <textarea class="inputs" id="descriptionshortid" aria-label="Short project description" placeholder="Ex: This project's purpose is to..." required></textarea> 
         
         <h3>Address (optional)</h3> 
-        <input class="inputs" id="addressid" type="text" autocomplete= "address-line1" placeholder="Ex: 1234 Hollywood Dr."></input>
+        <input class="inputs" id="addressid" type="text" autocomplete="address-line1" aria-label="Project address" placeholder="Ex: 1234 Hollywood Dr.">
 
       </div>
         
@@ -76,7 +78,7 @@
         <h3>Search and select location here</h3>
         <div class="map-selection-container">
           <div id='geocoder-container'></div>
-          <div id='map' alt="map loading error."></div> <!--change the id to 'map' to enable the map again, change it to 'map-test' to avoid -->
+          <div id="map" role="region" aria-label="Select a project location on the map"></div> <!--change the id to 'map' to enable the map again, change it to 'map-test' to avoid -->
         </div>
     </div>
 

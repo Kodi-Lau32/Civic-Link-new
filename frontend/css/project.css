@@ -1,162 +1,145 @@
-/* Project page (shares the story, badge, and section title styles with updates.css) */
-
-.project-page {
-  max-width: 900px;
-  margin: 80px auto 80px;
-  padding: 0 20px;
+.project-page { 
+  width: min(920px, calc(100% - 40px)); 
+  margin: 100px auto 72px; 
+  padding: 0; 
 }
-
-.project-back {
-  display: inline-block;
-  margin-bottom: 14px;
-  color: white;
-  font-weight: 600;
-  text-decoration: none;
+.project-back { 
+  display: inline-flex; 
+  min-height: 38px; 
+  align-items: center; 
+  margin: 0 0 12px; 
+  padding: 7px 10px; 
+  border-radius: 8px; 
+  color: var(--slate); 
+  font-size: .9rem; 
+  font-weight: 650; 
+  text-decoration: none; 
 }
-  .project-back:hover {
-    text-decoration: underline;
-  }
-
-.project-article {
-  padding: 36px 44px 44px;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 5px 12px rgba(15, 15, 15, 0.3);
-  color: #333;
+.project-back:hover { 
+  background: var(--accent-soft); 
+  color: var(--slate-deep); 
 }
-
-.project-loading {
-  color: #666;
-  text-align: center;
+.project-article { 
+  padding: clamp(24px, 5vw, 46px); 
+  border: 1px solid var(--line); 
+  border-radius: 16px; 
+  background: var(--surface); 
+  color: var(--ink); 
 }
-
-.project-title {
-  margin: 14px 0 8px;
-  color: #222;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 2.6rem;
-  line-height: 1.15;
+.project-loading { 
+  margin: 0; 
+  color: var(--muted); 
+  text-align: center; 
 }
-
-.project-byline {
-  color: #777;
-  font-size: 0.9rem;
-  font-style: italic;
+.project-title { 
+  margin: 12px 0 8px; 
+  color: var(--slate-deep); 
+  font-size: clamp(2rem, 5vw, 2.8rem); 
+  font-weight: 780; 
+  letter-spacing: -.055em; 
+  line-height: 1.1; 
 }
-
-/* same look as the dashboard's Edit button, on a white background */
-.project-article .project-edit-button {
-  display: inline-block;
-  margin-top: 14px;
-  padding: 6px 18px;
-  border-radius: 50px;
-  background: #eeeeee;
-  color: #555;
-  font-weight: 700;
-  text-decoration: none;
+.project-byline { 
+  color: var(--muted); 
+  font-size: .9rem; 
 }
-  .project-article .project-edit-button:hover {
-    background: #e2e2e2;
-  }
-
-.project-map {
-  height: 380px;
-  margin-top: 24px;
-  border-radius: 10px;
+.project-article .project-edit-button { 
+  display: inline-flex; 
+  min-height: 39px; 
+  align-items: center; 
+  margin-top: 13px; 
+  padding: 8px 13px; 
+  border: 1px solid var(--line); 
+  border-radius: 9px; 
+  background: #f5f7f9; 
+  color: var(--slate-deep); 
+  font-weight: 700; 
+  text-decoration: none; 
 }
-
-/* timeline */
-.project-timeline {
-  margin-top: 24px;
+.project-article .project-edit-button:hover { 
+  background: var(--accent-soft); 
 }
-
-.project-timeline-label {
-  margin-bottom: 8px;
-  font-weight: 700;
+.project-map { 
+  height: 370px; 
+  margin-top: 23px; 
+  overflow: hidden; 
+  border: 1px solid var(--line); 
+  border-radius: 11px; 
 }
-
-.project-timeline-bar {
-  height: 10px;
-  overflow: hidden;
-  border-radius: 5px;
-  background: #e6e6e6;
+.project-timeline { 
+  margin-top: 24px; 
 }
-
-.project-timeline-fill {
-  height: 100%;
-  border-radius: 5px;
+.project-timeline-label { 
+  margin-bottom: 9px; 
+  color: var(--slate-deep); 
+  font-weight: 700; 
 }
-
-.project-timeline-ends {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-  color: #888;
-  font-size: 0.8rem;
+.project-timeline-bar { 
+  height: 9px; 
+  overflow: hidden; 
+  border-radius: 99px; 
+  background: #e8edf2; 
 }
-
-/* key facts */
-.project-facts {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px 24px;
-  margin-top: 28px;
-  padding-top: 24px;
-  border-top: 1px solid #eee;
+.project-timeline-fill { 
+  height: 100%; 
+  border-radius: inherit; 
+  background: var(--accent); 
 }
-  .project-facts dt {
-    color: #888;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .project-facts dd {
-    margin-top: 4px;
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
-
-.project-subheading {
-  margin-top: 32px;
-  color: #222;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.4rem;
+.project-timeline-ends { 
+  display: flex; 
+  justify-content: space-between; 
+  gap: 16px; 
+  margin-top: 7px; 
+  color: var(--muted); 
+  font-size: .82rem; 
 }
-
-.project-description {
-  margin-top: 10px;
-  font-size: 1.1rem;
-  line-height: 1.7;
-  white-space: pre-wrap; /* keep line breaks from the submission */
+.project-facts { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); 
+  gap: 17px 22px; 
+  margin-top: 28px; 
+  padding-top: 23px; 
+  border-top: 1px solid var(--line); 
 }
-
-.project-resources {
-  margin-top: 10px;
-  padding-left: 20px;
-  font-size: 0.95rem;
-  line-height: 1.6;
+.project-facts dt { 
+  color: var(--muted); 
+  font-size: .73rem; 
+  font-weight: 750; 
+  letter-spacing: .07em; 
+  text-transform: uppercase; 
 }
-  .project-resources a {
-    overflow-wrap: anywhere; /* long links wrap instead of overflowing */
-  }
-
-/* nearby projects */
-.project-more {
-  margin-top: 50px;
+.project-facts dd { 
+  margin: 5px 0 0; 
+  color: var(--ink); 
+  font-size: .94rem; 
+  line-height: 1.5; 
 }
-
-.project-more-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 24px;
+.project-subheading { 
+  margin: 29px 0 0; 
+  color: var(--white); 
+  font-size: 1.32rem; 
+  font-weight: 750; 
+  letter-spacing: -.025em; 
 }
-
+.project-description { 
+  margin-top: 9px; 
+  color: #40536b; 
+  font-size: 1rem; 
+  line-height: 1.75; 
+  white-space: pre-wrap; 
+}
+.project-resources { 
+  margin-top: 10px; 
+  padding-left: 20px; 
+  color: #40536b; 
+  font-size: .94rem; 
+  line-height: 1.7; 
+}
+.project-resources a { overflow-wrap: anywhere; }
+.project-more { margin-top: 42px; }
+.project-more-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 16px; }
 @media (max-width: 700px) {
-  .project-article {
-    padding: 24px;
-  }
-  .project-title {
-    font-size: 1.9rem;
-  }
+  .project-page { width: calc(100% - 28px); margin-top: 84px; }
+  .project-article { padding: 23px 19px; }
+  .project-map { height: 290px; }
 }
