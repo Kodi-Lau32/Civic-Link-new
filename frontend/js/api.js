@@ -1,49 +1,49 @@
-// All network requests: Supabase database, our server (login + submit), Mapbox geocoding.
+// All network requests: Supabase (database + logins) and Mapbox geocoding.
+// The Supabase client comes from the supabase-js <script> tag on each page.
 
-// every project in the database (Supabase's REST API; the publishable key can only read)
+// keeps the logged-in engineer's session in this browser (localStorage) and refreshes it automatically
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+// every project in the database (anyone can read)
 async function loadProjects() {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/projects?select=*`, {
-    headers: supabaseHeaders(SUPABASE_PUBLISHABLE_KEY),
-  });
-  const rows = await response.json();
-  if (!response.ok) throw new Error(`Couldn't load projects: ${rows.message || response.status}`);
-  return rows.map(parseProject);
+  const { data, error } = await db.from("projects").select("*");
+  if (error) throw new Error(`Couldn't load projects: ${error.message}`);
+  return data.map(parseProject);
 }
 
-// older Supabase keys are JWTs ("eyJ...") and also go in Authorization; newer sb_ keys only go in apikey
-function supabaseHeaders(key) {
-  return key.startsWith("eyJ") ? { apikey: key, Authorization: `Bearer ${key}` } : { apikey: key };
-}
-
-// thrown when the server says the session is missing/expired
+// thrown when nobody is logged in, or the session has expired
 class NotLoggedInError extends Error {}
 
-// new project; the server records the logged-in engineer as its author. Resolves to the new id.
+// new project; the database records the logged-in engineer as its author. Resolves to the new id.
 async function submitProject(project) {
-  return sendProject("POST", `${API_URL}/projects`, project);
+  await requireLogin();
+  const { data, error } = await db.from("projects").insert(toDatabaseRow(project)).select("id").single();
+  if (error) throw saveError(error);
+  return data.id;
 }
 
 // saves changes to one of the logged-in engineer's own projects
 async function updateProject(id, project) {
-  return sendProject("PUT", `${API_URL}/projects/${encodeURIComponent(id)}`, project);
+  await requireLogin();
+  const { data, error } = await db.from("projects").update(toDatabaseRow(project)).eq("id", id).select("id");
+  if (error) throw saveError(error);
+  // the database skips projects you don't own instead of raising an error
+  if (data.length === 0) throw new Error("You can only edit your own projects.");
+  return id;
 }
 
-async function sendProject(method, url, project) {
-  const response = await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(toDatabaseRow(project)),
-  });
-  if (response.status === 401) throw new NotLoggedInError();
+async function requireLogin() {
+  const session = await getSession();
+  if (!session.loggedIn) throw new NotLoggedInError();
+}
 
-  const result = await response.json().catch(() => null);
-  if (!result) {
-    // not our server (e.g. opened with Live Server, which answers 405/404 to API calls)
-    throw new Error(`The Civic Link server didn't answer (${response.status}). Start it with "npm start" ` +
-      `in backendLogin and open the site at http://localhost:3000.`);
+// database error -> an Error with a message people can act on
+function saveError(error) {
+  if (error.code === "PGRST301" || /jwt/i.test(error.message)) return new NotLoggedInError();
+  if (error.code === "42501") {
+    return new Error("Your account isn't allowed to save projects. Ask an admin to give it a username.");
   }
-  if (!response.ok) throw new Error(result.message || `Save failed (${response.status})`);
-  return result.id;
+  return new Error(error.message);
 }
 
 // coordinates -> address text
@@ -80,18 +80,24 @@ async function forwardGeocode(address) {
   }
 }
 
-// resolves to { success, message }; on success the server sets a session cookie
-async function login(username, password) {
-  const response = await fetch(`${API_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  return response.json();
+// resolves to { success, message }
+async function login(email, password) {
+  const { data, error } = await db.auth.signInWithPassword({ email, password });
+  if (error) return { success: false, message: error.message === "Invalid login credentials" ? "Invalid email or password" : error.message };
+  if (!data.user.app_metadata.username) {
+    await db.auth.signOut();
+    return { success: false, message: "This account doesn't have a username yet. Ask an admin to set one up." };
+  }
+  return { success: true };
 }
 
-// resolves to { loggedIn, username }
+async function logout() {
+  await db.auth.signOut();
+}
+
+// resolves to { loggedIn, username }; username is set by an admin in the account's app_metadata
 async function getSession() {
-  const response = await fetch(`${API_URL}/session`);
-  return response.json();
+  const { data } = await db.auth.getSession();
+  const username = data.session?.user.app_metadata.username;
+  return { loggedIn: !!username, username: username || null };
 }

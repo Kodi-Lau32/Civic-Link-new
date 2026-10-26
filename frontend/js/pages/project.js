@@ -55,7 +55,7 @@ function renderArticle(project, session) {
 
   const parts = [meta, title, byline];
 
-  // only the author sees an Edit button (the server checks this again when saving)
+  // only the author sees an Edit button (the database checks this again when saving)
   if (session.loggedIn && project.author && project.author === session.username) {
     const edit = document.createElement("a");
     edit.className = "project-edit-button";

@@ -1,4 +1,4 @@
-// Login page: checks credentials with backendLogin/server.js, then goes to the engineer dashboard.
+// Login page: logs in with Supabase Auth, then goes to the engineer dashboard.
 
 const loginForm = document.getElementById("loginForm");
 const loginMessage = document.getElementById("message");
@@ -11,11 +11,11 @@ getSession()
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const username = document.getElementById("username").value;
+  const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
   try {
-    const result = await login(username, password);
+    const result = await login(email, password);
     if (result.success) {
       window.location.href = "dashboard.html";
     } else {
@@ -23,6 +23,6 @@ loginForm.addEventListener("submit", async (e) => {
     }
   } catch (error) {
     console.error(error);
-    loginMessage.innerText = "Server error. Is the server running? (npm start in backendLogin)";
+    loginMessage.innerText = "Couldn't reach the login service. Check your connection and try again.";
   }
 });

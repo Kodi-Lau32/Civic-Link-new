@@ -4,7 +4,7 @@ A website aimed to let city engineers post construction updates about their comm
 # Where code lives (frontend/js)
 - config.js — tokens, Supabase URL + publishable key, URLs, map defaults
 - projects.js — converts database rows to/from Project objects (only file that knows the table's columns)
-- api.js — all fetches (Supabase, our server, geocoding, login)
+- api.js — all network requests (Supabase database + logins, Mapbox geocoding)
 - render.js — map popups, update cards, recent list
 - map.js — map + search box + markers
 - project-search.js — keyword search/ranking of projects (title matches rank above address/description)
@@ -15,7 +15,8 @@ A website aimed to let city engineers post construction updates about their comm
   - pages/project.js — a single project's page (project.html?p=<key>), opened from the Updates page stories
 
 Database: Supabase table "projects", created by supabase/schema.sql (paste it into Supabase > SQL Editor > Run).
-The site reads it with the publishable key (frontend/js/config.js); the server writes it with the secret key (backendLogin/.env).
+The site talks to Supabase directly with the publishable key (frontend/js/config.js). Logins are Supabase Auth, and the
+database's rules (Row Level Security, in schema.sql) decide who can add/edit what, so there's no server of our own.
 
 Adding a project type: add it to PROJECT_TYPES and TYPE_COLORS (projects.js), then in the Supabase SQL Editor re-run the
 last two lines of supabase/schema.sql (projects_type_check) with the new key added to the list.
@@ -56,26 +57,19 @@ Backend:
 - ~~Find way to allow user to submit google coords~~
 - ~~Create login backend (w/ node.js and host it to the internet using a free site like Render)~~
 
-# RUNNING THE SITE (NODE.JS SERVER)
-Full step-by-step instructions: see RUNNING.md
+# RUNNING THE SITE
+Full step-by-step instructions (local preview, accounts, putting it on Render): see RUNNING.md
 
-The Node server in backendLogin/ hosts the whole website AND handles login + submissions,
-so open the site through it (not Live Server or by double-clicking the HTML files), or login won't work.
-
-1) download node.js
-2) in vscode terminal: "cd backendLogin", then "npm install" (first time only), then "npm start"
-3) open http://localhost:3000
-4) to turn off server: "ctrl+C" in terminal
+The site is plain HTML/CSS/JS with no server, so it can be hosted as a static site (e.g. a Render Static Site)
+or previewed locally with VS Code's Live Server.
 
 How login works:
-- Accounts live in backendLogin/users.json (passwords are hashed, not readable)
-- Add/change an account: "npm run add-user -- <username> <password>" (from backendLogin/); takes effect right away
-- submit.html and dashboard.html redirect to the login page unless you're logged in; logging in opens the dashboard
-- Submissions and edits go to the server, which checks the login and then saves them to Supabase
-- Each new project's "author" column is set by the server to the logged-in username; only that engineer can edit it
-  (projects copied from the old Google Sheet have no author, so they can't be edited from the site;
-   to make one editable, type a username into its author cell in Supabase > Table Editor > projects)
-- Logins reset when the server restarts
+- Engineer accounts are Supabase Auth users (Supabase dashboard > Authentication > Users); they log in with email + password
+- Each account needs a username set by an admin (see "Adding an engineer account" in RUNNING.md); that's what the "author" column stores
+- submit.html and dashboard.html send you to the login page unless you're logged in; logging in opens the dashboard
+- The database sets each new project's "author" to the logged-in engineer's username, and only lets them edit their own projects
+  (projects without an author can't be edited from the site; to make one editable, type a username into its author cell
+   in Supabase > Table Editor > projects)
 
 # Key things to note abt messy backend
 - Google maps have been switched to mapbox 
@@ -105,7 +99,7 @@ function loadmap(){
 loadmap();
 <script>
 
-Old Google Sheet (no longer used; copy it into Supabase with "npm run import-sheet" in backendLogin/):
+Old Google Sheet (no longer used; its projects were copied into Supabase):
 https://docs.google.com/spreadsheets/d/1UK356MwkhS73fkZHGkeQwS_UBx9YpTf9dIunNaGbXLw/edit?gid=0#gid=0
 
 

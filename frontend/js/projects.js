@@ -12,7 +12,7 @@
 //   description_short / description_long   summary for cards / full write-up for the project page
 //   resources    list of sources (links or citations)
 //   status       a key from PROJECT_STATUSES, or null = work it out from the dates
-//   author       username of the engineer who submitted it (set by the server; null on old sheet rows)
+//   author       username of the engineer who submitted it (set by the database from their login)
 //   start_date / end_date  "YYYY-MM-DD"
 //   submitted_at timestamp, set by the database
 
@@ -94,7 +94,7 @@ function projectStatus(statusSetting, startDate, endDate, today = new Date()) {
   return "ongoing";
 }
 
-// Project -> the columns the browser may send (the server sets id, author, and submitted_at)
+// Project -> the columns the browser may send (the database sets id, author, and submitted_at)
 function toDatabaseRow(project) {
   return {
     name: project.name,

@@ -87,3 +87,56 @@ alter table public.projects drop constraint if exists projects_type_check;
 alter table public.projects add constraint projects_type_check
   check (cardinality("type") > 0
          and "type" <@ array['construction', 'flock_camera', 'data_center', 'unwanted_repair']);
+
+
+-- =====================================================================================================
+-- Change 3 (2026-10-26): logins move from the Node server to Supabase Auth
+--
+-- HOW TO RUN: paste just this section into the SQL Editor and Run (safe to run again).
+--
+-- The website now writes to the database directly with the logged-in engineer's session, so the
+-- database itself enforces the rules the server used to:
+--   - only logged-in engineers can add projects, and author is always set to their own username
+--   - engineers can only edit their own projects, and only the editable columns
+--   - nobody can delete from the website
+-- An engineer's username lives in their account's app_metadata, which only an admin can set
+-- (see "Adding an engineer account" below), so nobody can claim someone else's username.
+-- =====================================================================================================
+
+-- new projects get the logged-in engineer's username as author
+alter table public.projects
+  alter column author set default (auth.jwt() -> 'app_metadata' ->> 'username');
+
+-- logged-in engineers may only write these columns (not id, author, or submitted_at)
+revoke insert, update, delete on table public.projects from anon, authenticated;
+grant insert (name, description_short, description_long, resources, address, type, status,
+              lng, lat, start_date, end_date) on table public.projects to authenticated;
+grant update (name, description_short, description_long, resources, address, type, status,
+              lng, lat, start_date, end_date) on table public.projects to authenticated;
+
+drop policy if exists "Engineers add their own projects" on public.projects;
+create policy "Engineers add their own projects"
+  on public.projects for insert
+  to authenticated
+  with check (author = (select auth.jwt() -> 'app_metadata' ->> 'username'));
+
+drop policy if exists "Engineers edit their own projects" on public.projects;
+create policy "Engineers edit their own projects"
+  on public.projects for update
+  to authenticated
+  using (author = (select auth.jwt() -> 'app_metadata' ->> 'username'))
+  with check (author = (select auth.jwt() -> 'app_metadata' ->> 'username'));
+
+-- -----------------------------------------------------------------------------------------------------
+-- Adding an engineer account (do this for each engineer; don't run it as part of this section):
+--   1. Supabase dashboard > Authentication > Users > Add user > Create new user.
+--      Enter their email and a password, and tick "Auto Confirm User".
+--   2. Give the account its username (this is what the author column stores) by running,
+--      with your values filled in:
+--
+--        update auth.users
+--        set raw_app_meta_data = raw_app_meta_data || jsonb_build_object('username', 'kodilau')
+--        where email = 'their-email@example.com';
+--
+--   3. If they were already logged in, they need to log out and back in to pick up the username.
+-- -----------------------------------------------------------------------------------------------------

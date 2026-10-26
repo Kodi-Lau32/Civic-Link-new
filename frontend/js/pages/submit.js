@@ -12,6 +12,12 @@ let currentUser = null;      // logged-in engineer's username
 const projectMarkers = [];
 
 async function initSubmitPage() {
+  // only logged-in engineers can submit (the database enforces this too)
+  if (!(await getSession()).loggedIn) {
+    window.location.href = "login.html";
+    return;
+  }
+
   mapboxsearch.autofill({ accessToken: MAPBOX_TOKEN });
   addTypeCheckboxes(document.getElementById("typeids"));
   addOptions(document.getElementById("statusid"), PROJECT_STATUSES);
@@ -175,7 +181,7 @@ async function handleSubmit(map, form) {
   const statusSetting = document.getElementById("statusid").value;
 
   const project = {
-    id: editingProject ? editingProject.id : null, // new ids come from the server
+    id: editingProject ? editingProject.id : null, // new ids come from the database
     name: document.getElementById("nameid").value,
     descriptionShort: document.getElementById("descriptionshortid").value,
     descriptionLong: document.getElementById("descriptionlongid").value,

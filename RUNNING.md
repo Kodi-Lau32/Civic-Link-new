@@ -1,109 +1,68 @@
 # Running Civic Link
 
-The Node server in `backendLogin/` runs the whole site: the pages, login, and project submissions.
-Always open the site through this server. Live Server and double-clicking the HTML files won't work, because login and submit depend on the server.
+Civic Link is a static website: plain HTML, CSS and JavaScript files with no server of its own.
+Projects and engineer logins live in Supabase, and the map comes from Mapbox, both reached straight from the browser.
 
-## 1. Install Node.js (first time only)
+## 1. Set up Supabase (first time only)
 
-Download and install the LTS version from https://nodejs.org.
-To check that it worked, open a terminal and run:
+1. In the Supabase dashboard, open **SQL Editor > New query**, paste in everything from `supabase/schema.sql`, and press **Run**.
+   It's safe to run again; steps that are already done are skipped.
+2. Put your project URL and **publishable** key in `frontend/js/config.js`, where it says `PASTE YOUR SUPABASE VALUES HERE`
+   (Supabase dashboard > **Project Settings > API Keys**; the URL is under **Data API**).
+   This key is meant to be public. On its own it can only read; the database's rules decide what logged-in engineers can change.
+3. Turn off public sign-ups so only accounts you create can log in:
+   **Authentication > Sign In / Providers**, then turn off **Allow new users to sign up**.
 
-```
-node -v
-```
+The secret key isn't used anywhere in the website. Never put it in `frontend/` or commit it.
 
-You should see a version number such as `v22.x.x`.
+## 2. Add engineer accounts
 
-## 2. Install dependencies (first time only)
+For each engineer:
 
-In the VS Code terminal, from the project folder:
+1. **Authentication > Users > Add user > Create new user.** Enter their email and a password, and tick **Auto Confirm User**.
+2. Give the account a username. This is what's saved as the author of their projects, and only that engineer can edit them.
+   In the **SQL Editor**, run this with your values filled in:
 
-```
-cd backendLogin
-npm install
-```
+   ```sql
+   update auth.users
+   set raw_app_meta_data = raw_app_meta_data || jsonb_build_object('username', 'kodilau')
+   where email = 'their-email@example.com';
+   ```
 
-## 3. Connect the database (first time only)
+   To keep editing projects you've already submitted, use the same username as before (for example `kodilau`).
+3. If they were already logged in, they need to log out and back in to pick up the username.
 
-Projects are stored in a Supabase database.
+To change a password: **Authentication > Users**, open the user's menu, and choose the reset or update option.
+To remove an account, delete the user there.
 
-1. Create a free project at https://supabase.com.
-2. In the Supabase dashboard, open **SQL Editor > New query**, paste in everything from `supabase/schema.sql`, and press **Run**.
-3. Open **Project Settings > API Keys** (the project URL is under **Data API**) and copy:
-   - the **publishable** key (or the older **anon** key) and the project URL into `frontend/js/config.js`, where it says `PASTE YOUR SUPABASE VALUES HERE`. This key can only read, so it's fine for it to be public.
-   - the **secret** key (or the older **service_role** key) and the project URL into `backendLogin/.env`. Make that file by copying `backendLogin/.env.example`. Never put the secret key in `frontend/` or commit it, because it can change anything in the database. `.env` is already in `.gitignore`.
-4. Optional: copy the projects from the old Google Sheet. From the `backendLogin` folder, run `npm run import-sheet`. Running it again won't make duplicates.
+## 3. Preview it on your computer
 
-## 4. Start the server
+Open the project folder in VS Code, right-click `index.html`, and choose **Open with Live Server**
+(install the "Live Server" extension first if you don't have it).
 
-From the `backendLogin` folder:
+Or, from a terminal in the project folder: `python3 -m http.server 8000`, then open http://localhost:8000.
 
-```
-npm start
-```
+Opening the HTML files by double-clicking them won't work, because browsers block some requests from `file://` pages.
 
-When it's running you'll see:
+## 4. Put it online with Render
 
-```
-✅ Server running on http://localhost:3000
-```
-
-Leave this terminal open. The site only works while the server is running.
-
-## 5. Open the site
-
-Go to **http://localhost:3000** in your browser.
-
-## 6. Log in and submit a project
-
-1. Click **Login** in the navbar.
-2. Enter your username and password.
-3. You'll land on your **Dashboard**, which lists every project you've submitted.
-4. Click **+ Submit a new project**, fill in the form, click the map to place the project, and press **Submit**.
-5. To change one of your projects, click **Edit** on its card in the Dashboard, make your changes, and press **Save changes**.
-
-The Submit and Dashboard pages send you back to Login if you aren't logged in. You can only edit projects you submitted yourself. Logins reset whenever the server restarts.
-
-## 7. Stop the server
-
-Press `Ctrl + C` in the terminal where the server is running.
-
----
-
-## Managing accounts
-
-Accounts are stored in `backendLogin/users.json` with hashed passwords, so they can't be read from the file.
-To add an account or change a password, run this from the `backendLogin` folder:
-
-```
-npm run add-user -- <username> <password>
-```
-
-For example, `npm run add-user -- jsmith MyStrongPassword`. The change takes effect right away; you don't need to restart.
-
-To delete an account, remove its entry from `users.json`.
+1. Push the project to GitHub.
+2. In Render, choose **New > Static Site** and connect the repository.
+3. Settings:
+   - **Build Command:** leave empty
+   - **Publish Directory:** `.` (the project folder itself, which contains `index.html`)
+4. Click **Create Static Site**. Render gives you an address like `https://civiclink.onrender.com`, and redeploys
+   automatically every time you push to GitHub.
+5. Optional: in Supabase, open **Authentication > URL Configuration** and set **Site URL** to your Render address.
+   This is only used by links in emails Supabase sends, such as password resets.
 
 ## Troubleshooting
 
 | Problem | Fix |
 |---|---|
-| Login says **"Server error"** | The server isn't running, or you opened the page some other way (Live Server, or the file directly). Start the server and use http://localhost:3000. |
-| **`EADDRINUSE`** when starting | Another program is using port 3000. Stop that program, or pick a different port: `PORT=3001 npm start`, then open http://localhost:3001. |
-| **`npm: command not found`** | Node.js isn't installed. Go back to step 1. |
-| **`Cannot find module 'express'`** | Run `npm install` in the `backendLogin` folder. |
-| **"Too many attempts"** on login | There have been 10 failed logins from your computer. Wait 15 minutes or restart the server. |
-| Submitting says **"Your login expired"** | Sessions last 8 hours, and they also end when the server restarts. Log in again. |
 | Pages say **"Couldn't load projects"** | `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` in `frontend/js/config.js` are missing or wrong, or `supabase/schema.sql` hasn't been run. The browser console shows the exact error. |
-| Submitting says **"Couldn't save the project"** | `backendLogin/.env` is missing or has the wrong secret key. The server prints a warning when it starts if it's missing. Restart the server after changing `.env`. |
-
-## Optional settings
-
-You can set these environment variables when starting the server (or put them in `backendLogin/.env`):
-
-| Variable | Default | Purpose |
-|---|---|---|
-| `PORT` | `3000` | Port the site runs on |
-| `SUPABASE_URL` | none (set in `.env`) | Your Supabase project URL |
-| `SUPABASE_SECRET_KEY` | none (set in `.env`) | Supabase secret key the server uses to save projects |
-
-Example (Mac/Linux): `PORT=8080 npm start`. On Windows PowerShell: `$env:PORT=8080; npm start`
+| Login says **"Invalid email or password"** | Check the account exists under **Authentication > Users** and is confirmed. |
+| Login says **"This account doesn't have a username yet"** | Run the username SQL from step 2 for that email, then log in again. |
+| Saving says **"Your account isn't allowed to save projects"** | The account's username is missing. Run the username SQL from step 2, then log out and back in. |
+| **Edit** button missing on a project you wrote | The project's `author` doesn't match your username exactly. Fix it in **Table Editor > projects**. |
+| Login doesn't work in Live Server, or the map is blank | Make sure you opened the site through Live Server or `http.server`, not by double-clicking the file. |

@@ -74,9 +74,9 @@ async function showLoginState() {
 
   let session = { loggedIn: false };
   try {
-    session = await (await fetch(`${API_URL}/session`)).json();
+    session = await getSession();
   } catch {
-    // server not reachable; show as logged out
+    // Supabase not reachable; show as logged out
   }
 
   if (session.loggedIn) {
@@ -144,7 +144,7 @@ function renderAccountMenu(account, username) {
   logout.type = "button";
   logout.textContent = "Log out";
   logout.addEventListener("click", async () => {
-    await fetch(`${API_URL}/logout`, { method: "POST" });
+    await logout();
     window.location.href = pageUrl("../index.html");
   });
   menu.appendChild(logout);
@@ -168,4 +168,5 @@ function avatarColor(username) {
 }
 
 renderNavbar();
-showLoginState();
+// getSession() is in api.js, which loads after this script
+document.addEventListener("DOMContentLoaded", showLoginState);
